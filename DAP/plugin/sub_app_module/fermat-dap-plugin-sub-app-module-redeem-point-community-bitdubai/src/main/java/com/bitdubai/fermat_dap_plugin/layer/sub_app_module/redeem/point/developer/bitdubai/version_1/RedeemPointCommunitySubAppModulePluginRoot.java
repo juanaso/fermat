@@ -209,10 +209,6 @@ public class RedeemPointCommunitySubAppModulePluginRoot extends AbstractPlugin i
                             assetRedeemPoint.getProfileImage(),
                             blockchainNetworkType);
 
-//                actorAssetIssuerManager.updateIssuerRegisteredDAPConnectionState(actorAssetIssuer.getActorPublicKey(), DAPConnectionState.CONNECTING);
-                    //TODO SOLO DEBE ENVIARSE EL MENSAJE LUEGO DE RECIBIDA LA ACEPTACION POR EL ISSUER A CONECTAR
-//                actorAssetRedeemPointManager.sendMessage(actorAssetRedeemPoint, actorAssetIssuers);
-
                     if (this.actorAssetRedeemPointManager.getActorRedeemPointRegisteredDAPConnectionState(assetRedeemPoint.getActorPublicKey(), blockchainNetworkType) != DAPConnectionState.REGISTERED_REMOTELY) {
                         System.out.println("The User you are trying to connect with is not connected" +
                                 "so we send the message to the assetRedeemPointActorNetworkService");
@@ -295,12 +291,12 @@ public class RedeemPointCommunitySubAppModulePluginRoot extends AbstractPlugin i
     }
 
     @Override
-    public void cancelActorAssetRedeem(String actorAssetRedeemLoggedInPublicKey, String actorAssetRedeemToCancelPublicKey) throws CantCancelConnectionActorAssetException {
+    public void cancelActorAssetRedeem(String actorAssetRedeemToCancelPublicKey) throws CantCancelConnectionActorAssetException {
         try {
 
-            this.actorAssetRedeemPointManager.cancelActorAssetRedeem(actorAssetRedeemLoggedInPublicKey, actorAssetRedeemToCancelPublicKey);
+            this.actorAssetRedeemPointManager.cancelActorAssetRedeem(actorAssetRedeemToCancelPublicKey);
 
-            this.assetRedeemPointActorNetworkServiceManager.cancelConnectionActorAsset(actorAssetRedeemLoggedInPublicKey, actorAssetRedeemToCancelPublicKey);
+//            this.assetRedeemPointActorNetworkServiceManager.cancelConnectionActorAsset(actorAssetRedeemLoggedInPublicKey, actorAssetRedeemToCancelPublicKey);
 
         } catch (CantCancelConnectionActorAssetException e) {
             errorManager.reportUnexpectedPluginException(Plugins.BITDUBAI_DAP_REDEEM_POINT_COMMUNITY_SUB_APP_MODULE, UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);

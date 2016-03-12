@@ -60,6 +60,9 @@ public class UserCommunityAdapter extends FermatAdapter<Actor, UserViewHolder> {
                         holder.connectedStateWaiting.setVisibility(View.GONE);
                         holder.connectedStateDenied.setVisibility(View.VISIBLE);
                         break;
+                    default:
+                        holder.connectedStateWaiting.setVisibility(View.GONE);
+                        holder.connectedStateDenied.setVisibility(View.GONE);
 
                 }
                 holder.connectedStateConnected.setVisibility(View.GONE);
@@ -81,6 +84,10 @@ public class UserCommunityAdapter extends FermatAdapter<Actor, UserViewHolder> {
 
             if (data.getDapConnectionState() == DAPConnectionState.DENIED_LOCALLY || data.getDapConnectionState() == DAPConnectionState.DENIED_REMOTELY) {
                 holder.status.setText(R.string.status_denied);
+            }
+
+            if (data.getDapConnectionState() == DAPConnectionState.CANCELLED_LOCALLY || data.getDapConnectionState() == DAPConnectionState.CANCELLED_REMOTELY) {
+                holder.status.setText(R.string.status_canceled);
             }
 
             holder.connect.setChecked(data.selected);
@@ -111,6 +118,10 @@ public class UserCommunityAdapter extends FermatAdapter<Actor, UserViewHolder> {
 
     public void setAdapterChangeListener(AdapterChangeListener<Actor> adapterChangeListener) {
         this.adapterChangeListener = adapterChangeListener;
+    }
+
+    public AdapterChangeListener<Actor> getAdapterChangeListener() {
+        return adapterChangeListener;
     }
 
     public int getSize() {

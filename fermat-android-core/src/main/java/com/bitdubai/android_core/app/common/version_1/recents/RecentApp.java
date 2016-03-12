@@ -1,29 +1,24 @@
 package com.bitdubai.android_core.app.common.version_1.recents;
 
-import com.bitdubai.fermat_api.AppsStatus;
-import com.bitdubai.fermat_api.layer.all_definition.navigation_structure.enums.FermatAppType;
+import com.bitdubai.fermat_android_api.engine.FermatRecentApp;
+import com.bitdubai.fermat_api.layer.all_definition.runtime.FermatApp;
+
+import java.io.Serializable;
 
 /**
  * Created by mati on 2016.03.03..
  */
-public class RecentApp {
+public class RecentApp implements FermatRecentApp,Serializable {
 
     private String publicKey;
-    private String name;
-    private AppsStatus appsStatus;
-    private FermatAppType fermatAppType;
-    private int backgroundColor;
+    private FermatApp fermatApp;
 
-    public RecentApp(String publicKey, int color) {
-        this.publicKey = publicKey;
-        this.backgroundColor = color;
-    }
+    private int taskStackPosition;
 
-    public RecentApp(String publicKey, String name, AppsStatus appsStatus, FermatAppType fermatAppType) {
+    public RecentApp(String publicKey, FermatApp fermatApp,int taskStackPosition) {
         this.publicKey = publicKey;
-        this.name = name;
-        this.appsStatus = appsStatus;
-        this.fermatAppType = fermatAppType;
+        this.fermatApp = fermatApp;
+        this.taskStackPosition = taskStackPosition;
     }
 
     public RecentApp(String appPublickKey) {
@@ -34,10 +29,17 @@ public class RecentApp {
         return publicKey;
     }
 
-    public int getBackgroundColor() {
-        return backgroundColor;
+    public FermatApp getFermatApp() {
+        return fermatApp;
     }
 
+    public int getTaskStackPosition() {
+        return taskStackPosition;
+    }
+
+    public void setTaskStackPosition(int taskStackPosition) {
+        this.taskStackPosition = taskStackPosition;
+    }
 
     @Override
     public boolean equals(Object o) {

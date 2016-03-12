@@ -239,7 +239,7 @@ public interface ActorAssetUserManager extends FermatManager {
      *
      * @throws CantConnectToActorAssetException
      */
-    void disconnectToActorAssetUser(String userPublicKey, BlockchainNetworkType blockchainNetworkType) throws CantDeleteRecordException, CantDisconnectAssetActorException;
+    void disconnectToActorAssetUser(String actorAssetToDisconnect, BlockchainNetworkType blockchainNetworkType) throws CantDeleteRecordException, CantDisconnectAssetActorException;
 
 //    /**
 //     * The method <code>disconnectIntraWalletUser</code> disconnect an intra user from the connections registry
@@ -257,11 +257,10 @@ public interface ActorAssetUserManager extends FermatManager {
 
     /**
      * The method <code>cancelIntraWalletUser</code> cancels an intra user from the connections registry
-     * @param actorAssetUserLoggedInPublicKey The public key of the intra user identity that is the receptor of the request
      * @param actorAssetUserToCancelPublicKey The public key of the intra user to cancel as connection
-     * @throws com.bitdubai.fermat_ccp_api.layer.actor.intra_user.exceptions.CantCancelIntraWalletUserException
+     * @throws CantCancelConnectionActorAssetException
      */
-    void cancelActorAssetUser(String actorAssetUserLoggedInPublicKey, String actorAssetUserToCancelPublicKey) throws CantCancelConnectionActorAssetException;
+    void cancelActorAssetUser(String actorAssetUserToCancelPublicKey) throws CantCancelConnectionActorAssetException;
 
     /**
      * The method <code>getWaitingYourAcceptanceIntraWalletUsers</code> shows the list of all intra users

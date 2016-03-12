@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The App Runtime is the module in charge of the UI navigation structure. A user is always at a certain point in this
@@ -130,6 +131,16 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
             return listSubApp.get(lastSubapPublicKey);
         }
         return homeScreen;
+    }
+
+    @Override
+    public FermatStructure getAppByPublicKey(String appPublicKey) {
+        return getSubAppByPublicKey(appPublicKey);
+    }
+
+    @Override
+    public Set<String> getListOfAppsPublicKey() {
+        return listSubApp.keySet();
     }
 
 
@@ -853,6 +864,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
             runtimeSubApp = new RuntimeSubApp();
             runtimeSubApp.setType(SubApps.DAP_ASSETS_IDENTITY_ISSUER);
             runtimeSubApp.setPublicKey(DAPPublicKeys.DAP_IDENTITY_ISSUER.getCode());
+            listSubApp.put(runtimeSubApp.getPublicKey(), runtimeSubApp);
 
             // Activity: List of identities
             runtimeActivity = new Activity();
@@ -906,7 +918,6 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
             runtimeActivity.addFragment(Fragments.DAP_SUB_APP_ASSET_ISSUER_IDENTITY_CREATE_IDENTITY_FRAGMENT.getKey(), runtimeFragment);
             runtimeActivity.setStartFragment(Fragments.DAP_SUB_APP_ASSET_ISSUER_IDENTITY_CREATE_IDENTITY_FRAGMENT.getKey());
 
-            listSubApp.put(runtimeSubApp.getPublicKey(), runtimeSubApp);
 
 
             /**
@@ -915,6 +926,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
             runtimeSubApp = new RuntimeSubApp();
             runtimeSubApp.setType(SubApps.DAP_ASSETS_IDENTITY_USER);
             runtimeSubApp.setPublicKey(DAPPublicKeys.DAP_IDENTITY_USER.getCode());
+            listSubApp.put(runtimeSubApp.getPublicKey(), runtimeSubApp);
 
             // Activity: List of identities
             runtimeActivity = new Activity();
@@ -968,14 +980,13 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
             runtimeActivity.addFragment(Fragments.DAP_SUB_APP_ASSET_USER_IDENTITY_CREATE_IDENTITY_FRAGMENT.getKey(), runtimeFragment);
             runtimeActivity.setStartFragment(Fragments.DAP_SUB_APP_ASSET_USER_IDENTITY_CREATE_IDENTITY_FRAGMENT.getKey());
 
-            listSubApp.put(runtimeSubApp.getPublicKey(), runtimeSubApp);
-
             /**
              * REDEEM POINT IDENTITY
              */
             runtimeSubApp = new RuntimeSubApp();
-            runtimeSubApp.setType(SubApps.DAP_REDEEM_POINT_IDENTITY);
+            runtimeSubApp.setType(SubApps.DAP_ASSETS_REDEEM_POINT_IDENTITY);
             runtimeSubApp.setPublicKey(DAPPublicKeys.DAP_IDENTITY_REDEEM.getCode());
+            listSubApp.put(runtimeSubApp.getPublicKey(), runtimeSubApp);
 
             // Activity: List of identities
             runtimeActivity = new Activity();
@@ -1028,9 +1039,6 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
             runtimeFragment.setType(Fragments.DAP_SUB_APP_REDEEM_POINT_IDENTITY_CREATE_IDENTITY_FRAGMENT.getKey());
             runtimeActivity.addFragment(Fragments.DAP_SUB_APP_REDEEM_POINT_IDENTITY_CREATE_IDENTITY_FRAGMENT.getKey(), runtimeFragment);
             runtimeActivity.setStartFragment(Fragments.DAP_SUB_APP_REDEEM_POINT_IDENTITY_CREATE_IDENTITY_FRAGMENT.getKey());
-
-            listSubApp.put(runtimeSubApp.getPublicKey(), runtimeSubApp);
-
 
         } catch (Exception e) {
             String message = com.bitdubai.fermat_dmp_plugin.layer.engine.sub_app_runtime.developer.bitdubai.version_1.exceptions.CantFactoryResetException.DEFAULT_MESSAGE;
@@ -1615,8 +1623,6 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setSideMenu(runtimeSideMenu);
 
         dapAssetIssuerCommunity.addActivity(runtimeActivity);
-
-        listSubApp.put(dapAssetIssuerCommunity.getPublicKey(), dapAssetIssuerCommunity);
 
         listSubApp.put(dapAssetIssuerCommunity.getPublicKey(), dapAssetIssuerCommunity);
     }
@@ -3366,6 +3372,32 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeFragment.setType(Fragments.CHT_CHAT_OPEN_PROFILE_DETAIL_FRAGMENT.getKey());
         runtimeActivity.addFragment(Fragments.CHT_CHAT_OPEN_PROFILE_DETAIL_FRAGMENT.getKey(), runtimeFragment);
         runtimeActivity.setStartFragment(Fragments.CHT_CHAT_OPEN_PROFILE_DETAIL_FRAGMENT.getKey());
+
+        // Activity: Send Error Report
+        runtimeActivity = new Activity();
+        runtimeActivity.setType(Activities.CHT_CHAT_OPEN_SEND_ERROR_REPORT);
+        runtimeActivity.setActivityType(Activities.CHT_CHAT_OPEN_SEND_ERROR_REPORT.getCode());
+        runtimeActivity.setBackActivity(Activities.CHT_CHAT_OPEN_SEND_ERROR_REPORT);
+        runtimeActivity.setBackPublicKey(chatPublicKey);//runtimeActivity.setBackPublicKey(Activities.CHT_CHAT_OPEN_CHATLIST.getCode());
+        runtimeActivity.setBackgroundColor("F9F9F9");
+        chtChat.addActivity(runtimeActivity);
+
+        statusBar = new StatusBar();
+        statusBar.setColor("#47BF73");
+        runtimeActivity.setStatusBar(statusBar);
+
+        runtimeTitleBar = new TitleBar();
+        runtimeTitleBar.setLabel("Error Report");
+        runtimeTitleBar.setLabelSize(16);
+        runtimeTitleBar.setTitleColor("#FFFFFF");
+        runtimeTitleBar.setIsTitleTextStatic(true);
+        runtimeTitleBar.setColor("#47BF73");
+        runtimeActivity.setTitleBar(runtimeTitleBar);
+
+        runtimeFragment = new Fragment();
+        runtimeFragment.setType(Fragments.CHT_CHAT_OPEN_SEND_ERROR_REPORT_FRAGMENT.getKey());
+        runtimeActivity.addFragment(Fragments.CHT_CHAT_OPEN_SEND_ERROR_REPORT_FRAGMENT.getKey(), runtimeFragment);
+        runtimeActivity.setStartFragment(Fragments.CHT_CHAT_OPEN_SEND_ERROR_REPORT_FRAGMENT.getKey());
 
         listSubApp.put(chtChat.getPublicKey(), chtChat);
     }

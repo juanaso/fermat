@@ -100,24 +100,20 @@ public class ContractDetailViewHolder extends FermatViewHolder implements View.O
             switch (contractDetail.getContractStep()) {
                 case 1:
                     //Send the payment to the Broker and update CardView background
-                    //TODO: this.walletManager.sendPayment(contractDetail.getContractId().toString());
+                    this.walletManager.sendPayment(contractDetail.getContractId());
                     itemView.setBackgroundColor(res.getColor(R.color.card_background_status_changed));
                     confirmButton.setVisibility(View.INVISIBLE);
                     textDescription.setText("You sent:");
                     Toast.makeText(this.parentFragment.getActivity(), "The payment has been delivered", Toast.LENGTH_SHORT).show();
-
-
-                    //updateBackground(contractDetail.getContractId().toString(), ContractDetailType.CUSTOMER_DETAIL);
                     break;
+
                 case 4:
                     //Confirm the reception of the broker's merchandise
-                    //TODO: this.walletManager.ackMerchandise(contractDetail.getContractId().toString());
+                    this.walletManager.ackMerchandise(contractDetail.getContractId());
                     itemView.setBackgroundColor(res.getColor(R.color.card_background_status_changed));
                     confirmButton.setVisibility(View.INVISIBLE);
                     textDescription.setText("You received:");
                     Toast.makeText(this.parentFragment.getActivity(), "The merchandise has been accepted", Toast.LENGTH_SHORT).show();
-
-                    //updateBackground(this.contractId.toString(), ContractDetailType.BROKER_DETAIL);
                     break;
             }
         } catch (Exception ex) {
@@ -134,6 +130,7 @@ public class ContractDetailViewHolder extends FermatViewHolder implements View.O
 
     }
 
+    //TODO: not needed, kill this when done testing
     private void updateBackground(String contractHash, ContractDetailType contractDetailType){
         try{
             ContractStatus contractStatus=this.walletManager.getContractStatus(contractHash);
@@ -180,7 +177,7 @@ public class ContractDetailViewHolder extends FermatViewHolder implements View.O
         //ContractStatus visualContractStatus=getContractStatusByContractDetailType(contractStatus, contractDetailType);
         //itemView.setBackgroundColor(getStatusBackgroundColor(visualContractStatus));
 
-
+        System.out.println("CONTRACT_DETAILS STATUS = "+itemInfo.getContractStatus());
 
         switch (itemInfo.getContractStep()){
             case 1:
@@ -366,10 +363,7 @@ public class ContractDetailViewHolder extends FermatViewHolder implements View.O
 
     @NonNull
     private String getFormattedAmount(String amount, String currencyCode) {
-        float aux = 0.0f;
-        try{ aux = Float.parseFloat(amount); } catch (Exception e){ }
-
-        return (decimalFormat.format(aux) + " " + currencyCode);
+        return amount + " " + currencyCode;
     }
 
     @NonNull

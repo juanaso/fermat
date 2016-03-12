@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.bitdubai.android_core.app.FermatActivity;
 import com.bitdubai.android_core.app.common.version_1.adapters.TabsPagerAdapter;
-import com.bitdubai.android_core.app.common.version_1.util.BroadcasterInterface;
+import com.bitdubai.android_core.app.common.version_1.util.interfaces.BroadcasterInterface;
 import com.bitdubai.fermat_android_api.layer.definition.wallet.AbstractFermatFragment;
 import com.bitdubai.fermat_api.layer.all_definition.enums.FermatApps;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
@@ -13,7 +13,7 @@ import com.bitdubai.fermat_api.layer.osa_android.broadcaster.BroadcasterType;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by mati on 2016.02.04..
+ * Created by Matias Furszyfer on 2016.02.04..
  */
 public class BroadcastManager implements BroadcasterInterface {
 
@@ -96,8 +96,8 @@ public class BroadcastManager implements BroadcasterInterface {
                     updateView(code);
                     break;
                 case NOTIFICATION_SERVICE:
-                    String publicKey = fermatActivity.get().searchAppFromPlatformIdentifier(fermatApps);
-                    fermatActivity.get().notificateBroadcast(publicKey,code);
+//                    String publicKey = fermatActivity.get().searchAppFromPlatformIdentifier(fermatApps);
+//                    fermatActivity.get().notificateBroadcast(publicKey,code);
                     break;
             }
         }catch (Exception e){
