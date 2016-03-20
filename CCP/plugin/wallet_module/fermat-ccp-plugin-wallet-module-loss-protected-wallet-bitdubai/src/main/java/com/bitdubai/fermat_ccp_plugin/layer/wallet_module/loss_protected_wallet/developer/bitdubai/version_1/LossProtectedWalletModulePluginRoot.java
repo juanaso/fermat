@@ -23,7 +23,7 @@ import com.bitdubai.fermat_bch_api.layer.crypto_module.crypto_address_book.inter
 import com.bitdubai.fermat_bch_api.layer.crypto_vault.bitcoin_vault.CryptoVaultManager;
 import com.bitdubai.fermat_ccp_api.layer.actor.extra_user.interfaces.ExtraUserManager;
 import com.bitdubai.fermat_ccp_api.layer.actor.intra_user.interfaces.IntraWalletUserActorManager;
-import com.bitdubai.fermat_ccp_api.layer.basic_wallet.bitcoin_wallet.interfaces.BitcoinWalletManager;
+import com.bitdubai.fermat_ccp_api.layer.basic_wallet.loss_protected_wallet.interfaces.BitcoinLossProtectedWalletManager;
 import com.bitdubai.fermat_ccp_api.layer.crypto_transaction.outgoing_extra_user.OutgoingExtraUserManager;
 import com.bitdubai.fermat_ccp_api.layer.crypto_transaction.outgoing_intra_actor.interfaces.OutgoingIntraActorManager;
 import com.bitdubai.fermat_ccp_api.layer.identity.intra_user.interfaces.IntraWalletUserIdentity;
@@ -42,6 +42,7 @@ import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exc
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.interfaces.LossProtectedWallet;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.interfaces.LossProtectedWalletManager;
 import com.bitdubai.fermat_ccp_plugin.layer.wallet_module.loss_protected_wallet.developer.bitdubai.version_1.structure.LossProtectedWalletModuleManager;
+import com.bitdubai.fermat_cer_api.layer.search.interfaces.CurrencyExchangeProviderFilterManager;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 
 import java.util.ArrayList;
@@ -57,13 +58,14 @@ import java.util.regex.Pattern;
         @NeededPluginReference(platform = Platforms.BLOCKCHAINS             , layer = Layers.MIDDLEWARE , plugin = Plugins.CRYPTO_ADDRESSES   ),
         @NeededPluginReference(platform = Platforms.CRYPTO_CURRENCY_PLATFORM, layer = Layers.TRANSACTION, plugin = Plugins.INCOMING_EXTRA_USER),
         @NeededPluginReference(platform = Platforms.CRYPTO_CURRENCY_PLATFORM, layer = Layers.TRANSACTION, plugin = Plugins.INCOMING_INTRA_USER)
+
 })
 public class LossProtectedWalletModulePluginRoot extends AbstractPlugin implements
         LossProtectedWalletManager,
         LogManagerForDevelopers {
 
-    @NeededPluginReference(platform = Platforms.CRYPTO_CURRENCY_PLATFORM, layer = Layers.BASIC_WALLET    , plugin = Plugins.BITCOIN_WALLET)
-    private BitcoinWalletManager bitcoinWalletManager;
+    @NeededPluginReference(platform = Platforms.CRYPTO_CURRENCY_PLATFORM, layer = Layers.BASIC_WALLET    , plugin = Plugins.LOSS_PROTECTED_WALLET)
+    private BitcoinLossProtectedWalletManager bitcoinWalletManager;
 
     @NeededPluginReference(platform = Platforms.BLOCKCHAINS             , layer = Layers.CRYPTO_VAULT    , plugin = Plugins.BITCOIN_VAULT)
     private CryptoVaultManager cryptoVaultManager;
@@ -107,6 +109,9 @@ public class LossProtectedWalletModulePluginRoot extends AbstractPlugin implemen
     @NeededAddonReference(platform = Platforms.OPERATIVE_SYSTEM_API, layer = Layers.SYSTEM, addon = Addons.PLUGIN_FILE_SYSTEM)
     private PluginFileSystem pluginFileSystem;
 
+    @NeededPluginReference(platform = Platforms.CURRENCY_EXCHANGE_RATE_PLATFORM, layer = Layers.SEARCH, plugin = Plugins.BITDUBAI_CER_PROVIDER_FILTER)
+    private CurrencyExchangeProviderFilterManager exchangeProviderFilterManagerproviderFilter;
+
     private String appPublicKey;
 
 
@@ -121,7 +126,7 @@ public class LossProtectedWalletModulePluginRoot extends AbstractPlugin implemen
 
         try {
 
-            logManager.log(LossProtectedWalletModulePluginRoot.getLogLevelByClass(this.getClass().getName()), "CryptoWallet instantiation started...", null, null);
+            logManager.log(LossProtectedWalletModulePluginRoot.getLogLevelByClass(this.getClass().getName()), "LossProtectedWallet instantiation started...", null, null);
 
             LossProtectedWalletModuleManager walletModuleLossProtectedWallet = new LossProtectedWalletModuleManager(
                     bitcoinWalletManager          ,
@@ -135,7 +140,8 @@ public class LossProtectedWalletModulePluginRoot extends AbstractPlugin implemen
                     intraWalletUserIdentityManager,
                     outgoingExtraUserManager      ,
                     outgoingIntraActorManager     ,
-                    walletContactsManager
+                    walletContactsManager,
+                    exchangeProviderFilterManagerproviderFilter
             );
 
             walletModuleLossProtectedWallet.initialize();
@@ -152,8 +158,8 @@ public class LossProtectedWalletModulePluginRoot extends AbstractPlugin implemen
     @Override
     public List<String> getClassesFullPath() {
         List<String> returnedClasses = new ArrayList<>();
-        returnedClasses.add("CryptoWalletCryptoModulePluginRoot");
-        returnedClasses.add("CryptoWalletWalletModuleManager");
+        returnedClasses.add("LossProtectedWalletModulePluginRoot");
+        returnedClasses.add("LossProtectedWalletModuleManager");
 
         /**
          * I return the values.
