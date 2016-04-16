@@ -12,7 +12,6 @@ import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEven
 import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEventHandler;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.VPNConnectionLooseNotificationEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.network_services.base.AbstractNetworkServiceBase;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.network_services.interfaces.NetworkService;
 
 
 /**
@@ -23,7 +22,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.network_se
  * @version 1.0
  * @since Java JDK 1.7
  */
-public class VPNConnectionLooseNotificationEventHandler implements FermatEventHandler {
+public class VPNConnectionLooseNotificationEventHandler implements FermatEventHandler<VPNConnectionLooseNotificationEvent> {
 
     /**
      * Represent the networkService
@@ -34,8 +33,8 @@ public class VPNConnectionLooseNotificationEventHandler implements FermatEventHa
      * Constructor with parameter
      * @param networkService
      */
-    public VPNConnectionLooseNotificationEventHandler(NetworkService networkService){
-        this.networkService = (AbstractNetworkServiceBase) networkService;
+    public VPNConnectionLooseNotificationEventHandler(AbstractNetworkServiceBase networkService){
+        this.networkService = networkService;
     }
 
     /**
@@ -43,12 +42,23 @@ public class VPNConnectionLooseNotificationEventHandler implements FermatEventHa
      * @see FermatEventHandler#handleEvent(FermatEvent)
      */
     @Override
-    public void handleEvent(FermatEvent fermatEvent) throws FermatException {
+    public void handleEvent(VPNConnectionLooseNotificationEvent vpnConnectionLooseNotificationEvent) throws FermatException {
         if (this.networkService.getStatus() == ServiceStatus.STARTED) {
-            VPNConnectionLooseNotificationEvent vpnConnectionLooseNotificationEvent = (VPNConnectionLooseNotificationEvent) fermatEvent;
-            if (vpnConnectionLooseNotificationEvent.getNetworkServiceApplicant() == networkService.getNetworkServiceProfile().getNetworkServiceType()) {
+
+            if(networkService.getNetworkServiceProfile() == null ||
+                    vpnConnectionLooseNotificationEvent.getNetworkServiceApplicant() == null) {
+
+                if (networkService.getNetworkServiceProfile() == null)
+                    System.out.println("********************************************************** \n\n plugin " + this.networkService.eventSource + " networkService.getNetworkServiceProfile() == null \n\n\n **********************************************************");
+
+                if (vpnConnectionLooseNotificationEvent.getNetworkServiceApplicant() == null)
+                    System.out.println("********************************************************** \n\n plugin " + this.networkService.eventSource + " vpnConnectionLooseNotificationEvent.getNetworkServiceApplicant() == null \n\n\n **********************************************************");
+
+
+            }else if (vpnConnectionLooseNotificationEvent.getNetworkServiceApplicant() == networkService.getNetworkServiceProfile().getNetworkServiceType()) {
                 this.networkService.handleVPNConnectionLooseNotificationEvent(vpnConnectionLooseNotificationEvent);
             }
+
         }
     }
 }

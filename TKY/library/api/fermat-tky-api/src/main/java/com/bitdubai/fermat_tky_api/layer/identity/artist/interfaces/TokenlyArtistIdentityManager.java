@@ -5,6 +5,7 @@ import com.bitdubai.fermat_tky_api.all_definitions.enums.ArtistAcceptConnections
 import com.bitdubai.fermat_tky_api.all_definitions.enums.ExposureLevel;
 import com.bitdubai.fermat_tky_api.all_definitions.enums.ExternalPlatform;
 import com.bitdubai.fermat_tky_api.all_definitions.exceptions.IdentityNotFoundException;
+import com.bitdubai.fermat_tky_api.all_definitions.exceptions.WrongTokenlyUserCredentialsException;
 import com.bitdubai.fermat_tky_api.layer.identity.artist.exceptions.ArtistIdentityAlreadyExistsException;
 import com.bitdubai.fermat_tky_api.layer.identity.artist.exceptions.CantCreateArtistIdentityException;
 import com.bitdubai.fermat_tky_api.layer.identity.artist.exceptions.CantGetArtistIdentityException;
@@ -29,10 +30,9 @@ public interface TokenlyArtistIdentityManager extends FermatManager{
 
     /**
      *
-     * @param alias
+     * @param userName
      * @param profileImage
-     * @param externalUserName
-     * @param externalAccessToken
+     * @param password
      * @param externalPlatform
      * @param exposureLevel
      * @param artistAcceptConnectionsType
@@ -41,30 +41,27 @@ public interface TokenlyArtistIdentityManager extends FermatManager{
      * @throws ArtistIdentityAlreadyExistsException
      */
     Artist createArtistIdentity(
-            String alias, byte[] profileImage,
-            String externalUserName, String externalAccessToken, ExternalPlatform externalPlatform,
+            String userName, byte[] profileImage, String password,ExternalPlatform externalPlatform,
             ExposureLevel exposureLevel, ArtistAcceptConnectionsType artistAcceptConnectionsType) throws
             CantCreateArtistIdentityException,
-            ArtistIdentityAlreadyExistsException;
+            ArtistIdentityAlreadyExistsException, WrongTokenlyUserCredentialsException;
 
     /**
      *
-     * @param alias
+     * @param username
+     * @param password
      * @param id
      * @param publicKey
      * @param profileImage
-     * @param externalUserName
-     * @param externalAccessToken
      * @param externalPlatform
      * @param exposureLevel
      * @param artistAcceptConnectionsType
      * @throws CantUpdateArtistIdentityException
      */
-    void updateArtistIdentity(
-            String alias, UUID id,String publicKey, byte[] profileImage,
-            String externalUserName, String externalAccessToken, ExternalPlatform externalPlatform,
+    Artist updateArtistIdentity(
+            String username, String password, UUID id, String publicKey, byte[] profileImage, ExternalPlatform externalPlatform,
             ExposureLevel exposureLevel, ArtistAcceptConnectionsType artistAcceptConnectionsType) throws
-            CantUpdateArtistIdentityException;
+            CantUpdateArtistIdentityException, WrongTokenlyUserCredentialsException;
 
     /**
      * This method returns a Artist identity

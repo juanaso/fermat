@@ -89,7 +89,7 @@ public class UserLevelBusinessTransactionCustomerBrokerSalePluginRoot extends Ab
     @NeededPluginReference(platform = Platforms.CRYPTO_BROKER_PLATFORM, layer = Layers.CONTRACT, plugin = Plugins.CONTRACT_SALE)
     CustomerBrokerContractSaleManager customerBrokerContractSaleManager;
 
-    @NeededPluginReference(platform = Platforms.CURRENCY_EXCHANGE_RATE_PLATFORM, layer = Layers.SEARCH, plugin = Plugins.BITDUBAI_CER_PROVIDER_FILTER)
+    @NeededPluginReference(platform = Platforms.CURRENCY_EXCHANGE_RATE_PLATFORM, layer = Layers.SEARCH, plugin = Plugins.FILTER)
     private CurrencyExchangeProviderFilterManager currencyExchangeRateProviderFilter;
 
     @NeededPluginReference(platform = Platforms.CRYPTO_BROKER_PLATFORM, layer = Layers.WALLET, plugin = Plugins.CRYPTO_BROKER_WALLET)
@@ -218,14 +218,15 @@ public class UserLevelBusinessTransactionCustomerBrokerSalePluginRoot extends Ab
         return developerDatabaseTableRecordList;
     }
 
-    UserLevelBusinessTransactionCustomerBrokerSaleMonitorAgent userLevelBusinessTransactionCustomerBrokerSaleMonitorAgent;
+    UserLevelBusinessTransactionCustomerBrokerSaleMonitorAgent agent;
     /**
      * This method will start the Monitor Agent that watches the asyncronic process registered in the Customer Broker Sale plugin
      * @throws CantStartAgentException
      */
     private void startMonitorAgent() throws CantStartAgentException {
-        if(userLevelBusinessTransactionCustomerBrokerSaleMonitorAgent == null) {
-            userLevelBusinessTransactionCustomerBrokerSaleMonitorAgent = new UserLevelBusinessTransactionCustomerBrokerSaleMonitorAgent(errorManager,
+        if(agent == null) {
+            agent = new UserLevelBusinessTransactionCustomerBrokerSaleMonitorAgent(
+                    errorManager,
                     customerBrokerSaleNegotiationManager,
                     pluginDatabaseSystem,
                     pluginId,
@@ -237,11 +238,11 @@ public class UserLevelBusinessTransactionCustomerBrokerSalePluginRoot extends Ab
                     bankMoneyRestockManager,
                     cashMoneyRestockManager,
                     cryptoMoneyRestockManager,
-                    notificationManagerMiddleware,
-                    customerBrokerSaleManager,
                     broadcaster);
-            userLevelBusinessTransactionCustomerBrokerSaleMonitorAgent.start();
-        }else userLevelBusinessTransactionCustomerBrokerSaleMonitorAgent.start();
+
+            agent.start();
+
+        }else agent.start();
     }
 
     public EventManager getEventManager() {

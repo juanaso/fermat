@@ -90,6 +90,11 @@ public class AndroidDatabaseTable implements DatabaseTable {
         return columns;
     }
 
+    @Override
+    public long getCount() throws CantLoadTableToMemoryException {
+        throw new RuntimeException("Implement me.");
+    }
+
     /**
      * <p>This method return a list of Database Table Record objects
      *
@@ -499,6 +504,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
                         strFilter.append(" >= '")
                                 .append(tableFilter.get(i).getValue())
                                 .append("'");
+                        break;
                     case GREATER_THAN:
                         strFilter.append(" >'")
                                 .append(tableFilter.get(i).getValue())
@@ -507,6 +513,7 @@ public class AndroidDatabaseTable implements DatabaseTable {
                     case LESS_OR_EQUAL_THAN:
                         strFilter.append(" <= ")
                                 .append(tableFilter.get(i).getValue());
+                        break;
                     case LESS_THAN:
                         strFilter.append(" < ")
                                 .append(tableFilter.get(i).getValue());

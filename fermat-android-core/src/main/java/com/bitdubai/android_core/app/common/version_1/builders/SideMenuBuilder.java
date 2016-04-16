@@ -25,7 +25,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
- * Created by mati on 2016.01.06..
+ * Created by Matias Furszyfer on 2016.01.06..
  */
 public class SideMenuBuilder {
 
@@ -54,9 +54,11 @@ public class SideMenuBuilder {
         while(!flag &&  counter<lstItems.size()){
             com.bitdubai.fermat_api.layer.all_definition.navigation_structure.MenuItem menuItem = lstItems.get(counter);
             Activities navActivity = menuItem.getLinkToActivity();
-            if(navActivity.getCode().equals(activityType)){
-                menuItem.setSelected(true);
-                flag=true;
+            if(navActivity!=null) {
+                if (navActivity.getCode().equals(activityType)) {
+                    menuItem.setSelected(true);
+                    flag = true;
+                }
             }
             counter++;
         }
@@ -67,6 +69,7 @@ public class SideMenuBuilder {
         if(itemDecoration!=null){
             navigation_recycler_view.addItemDecoration(itemDecoration);
         }
+        navigation_recycler_view.invalidate();
     }
 
     /**

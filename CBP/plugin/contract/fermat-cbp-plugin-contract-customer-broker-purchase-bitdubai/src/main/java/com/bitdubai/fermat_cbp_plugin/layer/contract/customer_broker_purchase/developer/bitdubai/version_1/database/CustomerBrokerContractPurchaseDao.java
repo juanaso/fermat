@@ -4,6 +4,7 @@ import com.bitdubai.fermat_api.layer.all_definition.exceptions.InvalidParameterE
 import com.bitdubai.fermat_api.layer.osa_android.database_system.Database;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseFilterOrder;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseFilterType;
+import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseRecord;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTable;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.DatabaseTableRecord;
 import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseSystem;
@@ -68,6 +69,7 @@ public class CustomerBrokerContractPurchaseDao {
                     throw new CantInitializeCustomerBrokerPurchaseContractDatabaseException(cantCreateDatabaseException.getMessage());
                 }
             }
+
         }
 
         public CustomerBrokerContractPurchase createCustomerBrokerPurchaseContract(CustomerBrokerContractPurchase contract) throws CantCreateCustomerBrokerContractPurchaseException {
@@ -120,6 +122,20 @@ public class CustomerBrokerContractPurchaseDao {
                 PurchaseNegotiationClauseTable.updateRecord(recordsToUpdate);
             } catch (CantUpdateRecordException e) {
                 throw new CantUpdateCustomerBrokerContractPurchaseException(CantUpdateCustomerBrokerContractPurchaseException.DEFAULT_MESSAGE, e, "", "");
+            }
+        }
+
+        //ADD YORDIN ALAYN 07.04.16
+        public void cancelContract(String contractID, String reason) throws CantUpdateCustomerBrokerContractPurchaseException {
+            try {
+                DatabaseTable PurchaseTable = this.database.getTable(CustomerBrokerPurchaseContractDatabaseConstants.CONTRACTS_PURCHASE_TABLE_NAME);
+                PurchaseTable.addStringFilter(CustomerBrokerPurchaseContractDatabaseConstants.CONTRACTS_PURCHASE_CONTRACT_ID_COLUMN_NAME, contractID, DatabaseFilterType.EQUAL);
+                DatabaseTableRecord recordToUpdate = PurchaseTable.getEmptyRecord();
+                recordToUpdate.setStringValue(CustomerBrokerPurchaseContractDatabaseConstants.CONTRACTS_PURCHASE_CANCEL_REASON_COLUMN_NAME, reason);
+                recordToUpdate.setStringValue(CustomerBrokerPurchaseContractDatabaseConstants.CONTRACTS_PURCHASE_STATUS_COLUMN_NAME, ContractStatus.CANCELLED.getCode());
+                PurchaseTable.updateRecord(recordToUpdate);
+            } catch (CantUpdateRecordException e) {
+                throw new CantUpdateCustomerBrokerContractPurchaseException("An exception happened", e, "", "");
             }
         }
 
@@ -215,9 +231,10 @@ public class CustomerBrokerContractPurchaseDao {
 
                 Purchases.setHistoryContracts(historyContracts);
 
+
                 /*
                     Waiting for Broker
-                 */
+                */
 
                 Query = "SELECT * FROM " +
                     CustomerBrokerPurchaseContractDatabaseConstants.CONTRACTS_PURCHASE_TABLE_NAME +
@@ -361,6 +378,7 @@ public class CustomerBrokerContractPurchaseDao {
             Long DateTime = record.getLongValue(CustomerBrokerPurchaseContractDatabaseConstants.CONTRACTS_PURCHASE_DATE_TIME_COLUMN_NAME);
             ContractStatus status = ContractStatus.getByCode(record.getStringValue(CustomerBrokerPurchaseContractDatabaseConstants.CONTRACTS_PURCHASE_STATUS_COLUMN_NAME));
             String nearExpirationDatetime = record.getStringValue(CustomerBrokerPurchaseContractDatabaseConstants.CONTRACTS_PURCHASE_NEAR_EXPIRATION_DATE_TIME_COLUMN_NAME);
+            String cancelReason = record.getStringValue(CustomerBrokerPurchaseContractDatabaseConstants.CONTRACTS_PURCHASE_CANCEL_REASON_COLUMN_NAME);
 
             Boolean _NearExpirationDatetime = true;
             if(nearExpirationDatetime.equals("0")){
@@ -375,7 +393,8 @@ public class CustomerBrokerContractPurchaseDao {
                     DateTime,
                     status,
                     getAllCustomerBrokerPurchaseContractClauses(contractID),
-                    _NearExpirationDatetime
+                    _NearExpirationDatetime,
+                    cancelReason
             );
         }
 
@@ -388,6 +407,7 @@ public class CustomerBrokerContractPurchaseDao {
             Long DateTime = record.getLongValue("Column4");
             ContractStatus status = ContractStatus.getByCode(record.getStringValue("Column5"));
             String nearExpirationDatetime = record.getStringValue("Column6");
+            String cancelReason = record.getStringValue("Column7");
 
             Boolean _NearExpirationDatetime = true;
             if(nearExpirationDatetime.equals("0")){
@@ -402,7 +422,8 @@ public class CustomerBrokerContractPurchaseDao {
                     DateTime,
                     status,
                     getAllCustomerBrokerPurchaseContractClauses(contractID),
-                    _NearExpirationDatetime
+                    _NearExpirationDatetime,
+                    cancelReason
             );
         }
 

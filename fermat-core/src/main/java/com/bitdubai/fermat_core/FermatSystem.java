@@ -2,6 +2,7 @@ package com.bitdubai.fermat_core;
 
 import com.bitdubai.fermat_api.FermatException;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_classes.AbstractAddon;
+import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_classes.AbstractModule;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.abstract_classes.AbstractPlugin;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.exceptions.CantGetAddonException;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.exceptions.CantGetErrorManagerException;
@@ -23,6 +24,7 @@ import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
 import com.bitdubai.fermat_api.layer.engine.runtime.RuntimeManager;
 import com.bitdubai.fermat_api.layer.modules.interfaces.ModuleManager;
 import com.bitdubai.fermat_api.layer.resources.ResourcesManager;
+import com.bitdubai.fermat_art_core.ARTPlatform;
 import com.bitdubai.fermat_bch_core.BCHPlatform;
 import com.bitdubai.fermat_bnk_core.BNKPlatform;
 import com.bitdubai.fermat_cbp_core.CBPPlatform;
@@ -34,7 +36,7 @@ import com.bitdubai.fermat_core_api.layer.all_definition.system.exceptions.CantR
 import com.bitdubai.fermat_core_api.layer.all_definition.system.exceptions.CantStartAddonException;
 import com.bitdubai.fermat_core_api.layer.all_definition.system.exceptions.CantStartSystemException;
 import com.bitdubai.fermat_csh_core.CSHPlatform;
-import com.bitdubai.fermat_dap_core.DAPPlatform;
+import org.fermat.fermat_dap_core.DAPPlatform;
 import com.bitdubai.fermat_p2p_core.P2PPlatform;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 import com.bitdubai.fermat_pip_core.PIPPlatform;
@@ -51,35 +53,38 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class FermatSystem {
 
-    private static FermatSystem INSTANCE = null;
+    private static volatile FermatSystem INSTANCE = null;
 
     private FermatSystemContext fermatSystemContext;
     private FermatAddonManager  fermatAddonManager ;
     private FermatPluginManager fermatPluginManager;
     public boolean isStarted;
 
-    private synchronized static void createInstance() {
-
+    private static void createInstance() {
         if (INSTANCE == null)
             INSTANCE = new FermatSystem();
     }
 
     private synchronized static void createInstance(final Object           osContext  ,
                                                     final AbstractPlatform osaPlatform) {
-
         if (INSTANCE == null)
             INSTANCE = new FermatSystem(osContext, osaPlatform);
     }
 
     public static FermatSystem getInstance() {
-        if (INSTANCE == null) createInstance();
+        synchronized (FermatSystem.class) {
+            if (INSTANCE == null) createInstance();
+        }
+
         return INSTANCE;
     }
 
     public static FermatSystem getInstance(final Object           osContext  ,
                                            final AbstractPlatform osaPlatform) {
 
-        if (INSTANCE == null) createInstance(osContext, osaPlatform);
+        synchronized (FermatSystem.class) {
+            if (INSTANCE == null) createInstance(osContext, osaPlatform);
+        }
         return INSTANCE;
     }
 
@@ -129,8 +134,7 @@ public final class FermatSystem {
         try {
 
             //TODO Desactivacion debido a un tema de P2P
-            //fermatSystemContext.registerPlatform(new ARTPlatform());
-
+            fermatSystemContext.registerPlatform(new ARTPlatform());
             fermatSystemContext.registerPlatform(new BCHPlatform());
             fermatSystemContext.registerPlatform(new BNKPlatform());
             fermatSystemContext.registerPlatform(new CBPPlatform());
@@ -143,6 +147,8 @@ public final class FermatSystem {
             fermatSystemContext.registerPlatform(new PIPPlatform());
             fermatSystemContext.registerPlatform(new TKYPlatform());
             fermatSystemContext.registerPlatform(new WPDPlatform());
+
+
 
 
 
@@ -246,8 +252,11 @@ public final class FermatSystem {
 
             final FermatManager moduleManager = fermatPluginManager.startPluginAndReferences(pluginVersionReference);
 
-            if (moduleManager instanceof ModuleManager)
-                return (ModuleManager) moduleManager;
+            if (moduleManager instanceof AbstractModule)
+                return  ((AbstractModule) moduleManager).getModuleManager();
+            else if (moduleManager instanceof  ModuleManager){
+                return (ModuleManager)moduleManager;
+            }
             else
                 throw new CantGetModuleManagerException(pluginVersionReference.toString3(), "The plugin version requested not implements module manager interface.");
 
@@ -281,8 +290,8 @@ public final class FermatSystem {
 
             final FermatManager moduleManager = fermatPluginManager.getPlugin(pluginVersionReference);
 
-            if (moduleManager instanceof ModuleManager)
-                return (ModuleManager) moduleManager;
+            if (moduleManager instanceof AbstractModule)
+                return ((AbstractModule) moduleManager).getModuleManager();
             else
                 throw new CantGetModuleManagerException(pluginVersionReference.toString3(), "The plugin version requested not implements module manager interface.");
 

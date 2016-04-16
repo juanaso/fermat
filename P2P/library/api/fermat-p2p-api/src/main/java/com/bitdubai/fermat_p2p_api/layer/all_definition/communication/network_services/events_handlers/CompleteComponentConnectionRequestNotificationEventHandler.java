@@ -12,7 +12,6 @@ import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEven
 import com.bitdubai.fermat_api.layer.all_definition.events.interfaces.FermatEventHandler;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.events.CompleteComponentConnectionRequestNotificationEvent;
 import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.network_services.base.AbstractNetworkServiceBase;
-import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.network_services.interfaces.NetworkService;
 
 /**
  * The Class <code>com.bitdubai.fermat_dmp_plugin.layer.network_service.template.developer.bitdubai.version_1.event_handlers.CompleteComponentConnectionRequestNotificationEventHandler</code>
@@ -23,7 +22,7 @@ import com.bitdubai.fermat_p2p_api.layer.all_definition.communication.network_se
  * @version 1.0
  * @since Java JDK 1.7
  */
-public class CompleteComponentConnectionRequestNotificationEventHandler implements FermatEventHandler {
+public class CompleteComponentConnectionRequestNotificationEventHandler implements FermatEventHandler<CompleteComponentConnectionRequestNotificationEvent> {
 
     /**
      * Represent the networkService
@@ -35,8 +34,8 @@ public class CompleteComponentConnectionRequestNotificationEventHandler implemen
      *
      * @param networkService
      */
-    public CompleteComponentConnectionRequestNotificationEventHandler(NetworkService networkService) {
-        this.networkService = (AbstractNetworkServiceBase) networkService;
+    public CompleteComponentConnectionRequestNotificationEventHandler(AbstractNetworkServiceBase networkService) {
+        this.networkService = networkService;
     }
 
     /**
@@ -44,20 +43,32 @@ public class CompleteComponentConnectionRequestNotificationEventHandler implemen
      *
      * @see FermatEventHandler#handleEvent(FermatEvent)
      *
-     * @param platformEvent
+     * @param completeComponentConnectionRequestNotificationEvent
      * @throws Exception
      */
     @Override
-    public void handleEvent(FermatEvent platformEvent) throws FermatException {
+    public void handleEvent(CompleteComponentConnectionRequestNotificationEvent completeComponentConnectionRequestNotificationEvent) throws FermatException {
 
         if (this.networkService.getStatus() == ServiceStatus.STARTED) {
-            CompleteComponentConnectionRequestNotificationEvent completeComponentConnectionRequestNotificationEvent = (CompleteComponentConnectionRequestNotificationEvent) platformEvent;
-            if(completeComponentConnectionRequestNotificationEvent.getNetworkServiceTypeApplicant() == networkService.getNetworkServiceProfile().getNetworkServiceType()){
+
+            if(networkService.getNetworkServiceProfile() == null ||
+                    completeComponentConnectionRequestNotificationEvent.getNetworkServiceTypeApplicant() == null) {
+
+                if (networkService.getNetworkServiceProfile() == null)
+                    System.out.println("********************************************************** \n\n plugin " + this.networkService.eventSource + " networkService.getNetworkServiceProfile() == null \n\n\n **********************************************************");
+
+                if (completeComponentConnectionRequestNotificationEvent.getNetworkServiceTypeApplicant() == null)
+                    System.out.println("********************************************************** \n\n plugin " + this.networkService.eventSource + " completeComponentConnectionRequestNotificationEvent.getNetworkServiceTypeApplicant() == null \n\n\n **********************************************************");
+
+
+
+            }else if(completeComponentConnectionRequestNotificationEvent.getNetworkServiceTypeApplicant() == networkService.getNetworkServiceProfile().getNetworkServiceType()){
 
                 /*
                  *  networkService make the job
                  */
                 this.networkService.handleCompleteComponentConnectionRequestNotificationEvent(completeComponentConnectionRequestNotificationEvent);
+
             }
         }
     }

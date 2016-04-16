@@ -3,6 +3,7 @@ package com.bitdubai.fermat_tky_api.layer.identity.fan.interfaces;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.interfaces.FermatManager;
 import com.bitdubai.fermat_tky_api.all_definitions.enums.ExternalPlatform;
 import com.bitdubai.fermat_tky_api.all_definitions.exceptions.IdentityNotFoundException;
+import com.bitdubai.fermat_tky_api.all_definitions.exceptions.WrongTokenlyUserCredentialsException;
 import com.bitdubai.fermat_tky_api.layer.identity.fan.exceptions.CantCreateFanIdentityException;
 import com.bitdubai.fermat_tky_api.layer.identity.fan.exceptions.CantGetFanIdentityException;
 import com.bitdubai.fermat_tky_api.layer.identity.fan.exceptions.CantListFanIdentitiesException;
@@ -28,36 +29,31 @@ public interface TokenlyFanIdentityManager extends FermatManager {
 
     /**
      *
-     * @param alias
+     * @param userName
      * @param profileImage
-     * @param externalUserName
-     * @param externalAccessToken
+     * @param externalPassword
      * @param externalPlatform
      * @return
      * @throws CantCreateFanIdentityException
      * @throws FanIdentityAlreadyExistsException
      */
     Fan createFanIdentity(
-            String alias, byte[] profileImage,
-            String externalUserName, String externalAccessToken, ExternalPlatform externalPlatform) throws
+            String userName, byte[] profileImage, String externalPassword, ExternalPlatform externalPlatform) throws
             CantCreateFanIdentityException,
-            FanIdentityAlreadyExistsException;
+            FanIdentityAlreadyExistsException, WrongTokenlyUserCredentialsException;
 
     /**
      *
-     * @param alias
+     * @param userName
      * @param id
      * @param publicKey
      * @param profileImage
-     * @param externalUserName
-     * @param externalAccessToken
      * @param externalPlatform
      * @throws CantUpdateFanIdentityException
      */
-    void updateFanIdentity(
-            String alias, UUID id,String publicKey, byte[] profileImage,
-            String externalUserName, String externalAccessToken, ExternalPlatform externalPlatform) throws
-            CantUpdateFanIdentityException;
+    Fan updateFanIdentity(
+            String userName, String password, UUID id, String publicKey, byte[] profileImage, ExternalPlatform externalPlatform) throws
+            CantUpdateFanIdentityException, WrongTokenlyUserCredentialsException;
 
     /**
      * This method returns a Fan identity
@@ -69,6 +65,16 @@ public interface TokenlyFanIdentityManager extends FermatManager {
     Fan getFanIdentity(UUID publicKey) throws
             CantGetFanIdentityException,
             IdentityNotFoundException;
+
+    /**
+     * This method updates a Fan identity in database.
+     * This method can be used to update the plugin database when the Fan identity object include a
+     * new artist connected to be persisted.
+     * @param fan
+     * @throws CantUpdateFanIdentityException
+     */
+    void updateFanIdentity(Fan fan) throws
+            CantUpdateFanIdentityException;
 
 
 }

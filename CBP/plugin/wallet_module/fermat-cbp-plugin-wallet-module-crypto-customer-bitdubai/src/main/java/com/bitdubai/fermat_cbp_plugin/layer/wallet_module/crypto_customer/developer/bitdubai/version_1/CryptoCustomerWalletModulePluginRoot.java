@@ -33,6 +33,8 @@ import com.bitdubai.fermat_cbp_api.layer.business_transaction.customer_ack_onlin
 import com.bitdubai.fermat_cbp_api.layer.business_transaction.customer_offline_payment.interfaces.CustomerOfflinePaymentManager;
 import com.bitdubai.fermat_cbp_api.layer.business_transaction.customer_online_payment.interfaces.CustomerOnlinePaymentManager;
 import com.bitdubai.fermat_cbp_api.layer.contract.customer_broker_purchase.interfaces.CustomerBrokerContractPurchaseManager;
+import com.bitdubai.fermat_cbp_api.layer.identity.crypto_customer.exceptions.CantPublishIdentityException;
+import com.bitdubai.fermat_cbp_api.layer.identity.crypto_customer.exceptions.IdentityNotFoundException;
 import com.bitdubai.fermat_cbp_api.layer.identity.crypto_customer.interfaces.CryptoCustomerIdentity;
 import com.bitdubai.fermat_cbp_api.layer.identity.crypto_customer.interfaces.CryptoCustomerIdentityManager;
 import com.bitdubai.fermat_cbp_api.layer.negotiation.customer_broker_purchase.interfaces.CustomerBrokerPurchaseNegotiationManager;
@@ -46,6 +48,7 @@ import com.bitdubai.fermat_cbp_api.layer.wallet_module.crypto_customer.interface
 import com.bitdubai.fermat_cbp_plugin.layer.wallet_module.crypto_customer.developer.bitdubai.version_1.structure.CryptoCustomerWalletAssociatedSettingImpl;
 import com.bitdubai.fermat_cbp_plugin.layer.wallet_module.crypto_customer.developer.bitdubai.version_1.structure.CryptoCustomerWalletModuleCryptoCustomerWalletManager;
 import com.bitdubai.fermat_cbp_plugin.layer.wallet_module.crypto_customer.developer.bitdubai.version_1.structure.CryptoCustomerWalletModuleNegotiationBankAccount;
+import com.bitdubai.fermat_ccp_api.layer.basic_wallet.bitcoin_wallet.interfaces.BitcoinWalletManager;
 import com.bitdubai.fermat_cer_api.layer.search.interfaces.CurrencyExchangeProviderFilterManager;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
@@ -102,7 +105,7 @@ public class CryptoCustomerWalletModulePluginRoot extends AbstractPlugin impleme
     @NeededPluginReference(platform = Platforms.CRYPTO_BROKER_PLATFORM, layer = Layers.NEGOTIATION_TRANSACTION, plugin = Plugins.CUSTOMER_BROKER_CLOSE)
     CustomerBrokerCloseManager customerBrokerCloseManager;
 
-    @NeededPluginReference(platform = Platforms.CURRENCY_EXCHANGE_RATE_PLATFORM, layer = Layers.SEARCH, plugin = Plugins.BITDUBAI_CER_PROVIDER_FILTER)
+    @NeededPluginReference(platform = Platforms.CURRENCY_EXCHANGE_RATE_PLATFORM, layer = Layers.SEARCH, plugin = Plugins.FILTER)
     CurrencyExchangeProviderFilterManager currencyExchangeProviderFilterManager;
 
     @NeededPluginReference(platform = Platforms.CRYPTO_BROKER_PLATFORM, layer = Layers.ACTOR, plugin = Plugins.CRYPTO_CUSTOMER_ACTOR)
@@ -134,6 +137,9 @@ public class CryptoCustomerWalletModulePluginRoot extends AbstractPlugin impleme
 
     @NeededPluginReference(platform = Platforms.CRYPTO_BROKER_PLATFORM, layer = Layers.ACTOR_CONNECTION     , plugin = Plugins.CRYPTO_BROKER     )
     private CryptoBrokerActorConnectionManager cryptoBrokerActorConnectionManager;
+
+    @NeededPluginReference(platform = Platforms.CRYPTO_CURRENCY_PLATFORM, layer = Layers.BASIC_WALLET, plugin = Plugins.BITCOIN_WALLET)
+    BitcoinWalletManager bitcoinWalletManager;
 
 
     //TODO Change for actorExtraDataManager
@@ -177,6 +183,7 @@ public class CryptoCustomerWalletModulePluginRoot extends AbstractPlugin impleme
                         brokerSubmitOnlineMerchandiseManager,
                         brokerSubmitOfflineMerchandiseManager,
                         getSettingsManager(),
+                        bitcoinWalletManager,
                         errorManager,
                         this.getPluginVersionReference()
 
@@ -273,12 +280,15 @@ public class CryptoCustomerWalletModulePluginRoot extends AbstractPlugin impleme
 
     private void preConfigureWallet() {
         final String customerWalletPublicKey = "crypto_customer_wallet";
-        boolean walletConfigured;
+
         try {
             walletManager = getCryptoCustomerWallet(customerWalletPublicKey);
-            walletConfigured = walletManager.isWalletConfigured(customerWalletPublicKey);
-            if (!walletConfigured) {
-                // IDENTITY
+            //walletManager.isWalletConfigured(customerWalletPublicKey);
+
+            List<CryptoCustomerIdentity> identities = walletManager.getListOfIdentities();
+
+            if( identities.isEmpty() ) {
+
                 createIdentity("Crypto Customer", "", new byte[0]);
                 final CryptoCustomerIdentity cryptoCustomerIdentity = walletManager.getListOfIdentities().get(0);
                 walletManager.associateIdentity(cryptoCustomerIdentity, customerWalletPublicKey);
@@ -302,13 +312,25 @@ public class CryptoCustomerWalletModulePluginRoot extends AbstractPlugin impleme
 
                 // BANK ACCOUNTS
                 walletManager.createNewBankAccount(new CryptoCustomerWalletModuleNegotiationBankAccount(FiatCurrency.US_DOLLAR,
-                        "Bank: Banesco\nAccount Number: 1324-548-123456789\nType:Current"));
+                        "Bank: Banesco\nAccount Number: 1324-548-123456789\nType: Current"));
 
+
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            cryptoCustomerIdentityManager.publishIdentity(cryptoCustomerIdentity.getPublicKey());
+                        } catch (IdentityNotFoundException e) {
+                        } catch (CantPublishIdentityException e) {
+                        }
+                    }
+                }.start();
             }
+
         } catch (Exception e) {
-            errorManager.reportUnexpectedPluginException(Plugins.CRYPTO_CUSTOMER,
-                    UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
+            errorManager.reportUnexpectedPluginException(Plugins.CRYPTO_CUSTOMER, UnexpectedPluginExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_PLUGIN, e);
         }
+
     }
 
     private InstalledWallet getInstalledWallet(Platforms platform) throws CantListWalletsException {

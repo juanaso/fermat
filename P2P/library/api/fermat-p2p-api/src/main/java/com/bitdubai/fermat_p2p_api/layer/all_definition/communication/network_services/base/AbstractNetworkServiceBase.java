@@ -311,10 +311,13 @@ public abstract class AbstractNetworkServiceBase  extends AbstractPlugin impleme
                     contextBuffer.append("Plugin ID: " + pluginId);
                     contextBuffer.append(CantStartPluginException.CONTEXT_CONTENT_SEPARATOR);
                     contextBuffer.append("Database Name: " + CommunicationNetworkServiceDatabaseConstants.DATA_BASE_NAME);
+                    contextBuffer.append("NS Name: " + networkServiceType);
 
                     String context = contextBuffer.toString();
-                    String possibleCause = "The Template triggered an unexpected problem that wasn't able to solve by itself";
+                    String possibleCause = "The Template triggered an unexpected problem that wasn't able to solve by itself - ";
+                    possibleCause += exception.getMessage();
                     CantStartPluginException pluginStartException = new CantStartPluginException(CantStartPluginException.DEFAULT_MESSAGE, exception, context, possibleCause);
+                    exception.printStackTrace();
 
                     errorManager.reportUnexpectedPluginException(this.getPluginVersionReference(), UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN, pluginStartException);
                     throw pluginStartException;
@@ -1023,8 +1026,7 @@ public abstract class AbstractNetworkServiceBase  extends AbstractPlugin impleme
     }
 
     /**
-     * This method is automatically called when the network service receive
-     * a new message was sent
+     * This method is automatically called when the message was sent
      *
      * @param messageSent
      */

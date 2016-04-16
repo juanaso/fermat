@@ -1,11 +1,12 @@
 package com.bitdubai.fermat_tky_api.layer.external_api.interfaces.music;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 /**
  * Created by Manuel Perez (darkpriestrelative@gmail.com) on 13/03/16.
  */
-public interface Song {
+public interface Song extends Serializable {
 
     /**
      * This method returns the Song Id.
@@ -53,7 +54,7 @@ public interface Song {
      * This method returns the song credits
      * @return
      */
-    String credits();
+    String getCredits();
 
     /**
      * This method returns the song copyright.
@@ -90,5 +91,11 @@ public interface Song {
      * @return
      */
     String getOther();
+
+    /**
+     * Represents the song download URL.
+     * @return
+     */
+    String getDownloadUrl();
 
 }

@@ -17,7 +17,7 @@ public interface BitcoinLossProtectedWalletBalance {
     * amount of satoshis the user has.
    */
 
-    long getBalance(BlockchainNetworkType blockchainNetworkType) throws CantCalculateBalanceException;
+    long getRealBalance(BlockchainNetworkType blockchainNetworkType) throws CantCalculateBalanceException;
 
      /**
       * Throw the method <code>getTransactionBqyId</code> return wallet available balance for actual exchange rate.
@@ -26,7 +26,9 @@ public interface BitcoinLossProtectedWalletBalance {
       * @return
       * @throws CantCalculateBalanceException
       */
-    long getBalance(BlockchainNetworkType blockchainNetworkType, long exchangeRate) throws CantCalculateBalanceException;
+    long getBalance(BlockchainNetworkType blockchainNetworkType, String exchangeRate) throws CantCalculateBalanceException;
+
+    long getBalance(BlockchainNetworkType blockchainNetworkType) throws CantCalculateBalanceException;
 
     void debit(BitcoinLossProtectedWalletTransactionRecord cryptoTransaction) throws CantRegisterDebitException;
 

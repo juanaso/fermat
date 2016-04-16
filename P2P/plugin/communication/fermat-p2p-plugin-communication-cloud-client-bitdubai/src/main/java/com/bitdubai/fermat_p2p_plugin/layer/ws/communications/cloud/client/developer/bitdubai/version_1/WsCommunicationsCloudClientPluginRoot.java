@@ -38,7 +38,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -47,8 +46,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.websocket.DeploymentException;
 
 /**
  * The Class <code>com.bitdubai.fermat_p2p_plugin.layer.communication.server.developer.bitdubai.version_1.WsCommunicationsCloudClientPluginRoot</code> is
@@ -275,7 +272,7 @@ public class WsCommunicationsCloudClientPluginRoot extends AbstractPlugin implem
     public void reloadConnectClient() throws Exception {
 
         System.out.println(" WsCommunicationsCloudClientPluginRoot - ****************************************************************");
-        System.out.println(" WsCommunicationsCloudClientPluginRoot - ReConnecting with the cloud server. Server IP ("+SERVER_IP+")  Port "+PORT);
+        System.out.println(" WsCommunicationsCloudClientPluginRoot - ReloadConnecting with the cloud server. Server IP ("+SERVER_IP+")  Port "+PORT);
         System.out.println(" WsCommunicationsCloudClientPluginRoot - ****************************************************************");
 
         /*
@@ -342,6 +339,7 @@ public class WsCommunicationsCloudClientPluginRoot extends AbstractPlugin implem
      * (non-Javadoc)
      *
      * @see WsCommunicationsCloudClientManager#getCommunicationsCloudClientConnection()
+     * //TODO: acá hay que pasarle algo para devolverle el cloud client del server
      */
     @Override
     public CommunicationsClientConnection getCommunicationsCloudClientConnection() {

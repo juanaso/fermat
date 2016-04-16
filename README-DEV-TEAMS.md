@@ -6,17 +6,17 @@
 
 All the work done for the Fermat open source project is done by several teams of people collaborating between each other. Fermat has several teams working in parallel. Most of them are dev teams, but these are not the only ones. Fermat also has teams of graphic designers, 3d artists, video producers, copy writers, publishing, etc.
 
-bitDubai is a network of teams working on the Fermat project. In this document you will learn about how bitDubai teams are organized. At the moment bitDubai is the only team-network working on Fermat, but there is room for other networks to join and they might want to get organized in a different way.
+Fermat Dev Teams is a network of teams working on the Fermat project. In this document you will learn about how these teams are organized. At the moment Fermat Dev Teams is the only teams-network working on Fermat, but there is room for other networks to join and they might want to get organized in a different way.
 
-Below you will find a list of bitDubai/Fermat developers teams. Feel free to contact their team leaders if you want to join them.
+Below you will find a list of Fermat developers teams. Feel free to contact the team leader if you want to join any of them.
 
 You can also contribute to the Fermat project through other means. Please refer to the [CONTRIBUTING GUIDE](https://github.com/bitDubai/fermat/blob/master/CONTRIBUTING.md) for more details.
 
-## bitDubai Teams Organization
+## Fermat Dev Teams Organization
 
 The maximun size for a team is 5 people. All of them together should have all the skill sets needed for these kind of projects.
 
-Teams are organized in a hierarchical way. This helps the task of reviewing changes in source code, since it is expected that a child team changes they are pushed to its parent team in order to be reviewed, merged with their own changes and pushed again to the next parent in the hierarchy. At the top the core developers are the only ones merging the combined batch of changes into the bitDubai codebase.
+Teams are organized in a hierarchical way. This helps the task of reviewing changes in source code, since it is expected that a child team changes they are pushed to its parent team in order to be reviewed, merged with their own changes and pushed again to the next parent in the hierarchy. At the top Fermat Core Developers are the only ones merging the combined batch of changes into the Fermat codebase.
 
 
 ## Teams List
@@ -29,6 +29,7 @@ Teams are organized in a hierarchical way. This helps the task of reviewing chan
 * Mordor
 * Kabuto
 * Skynet
+* Yayo
 * Navi Charlie
 * Navi Sierra
 * Fsociety
@@ -232,12 +233,14 @@ We would be grateful for any help received, and anyone interested in joining the
 ### ![alt text](https://raw.githubusercontent.com/bitDubai/media-kit/1479ec1f2e93a1b11f0f1ac9e312099f08aa7aec/Logotype/FermatTeams/logo_mordor_team.jpg "Logo Mordor Team")
 We are putting together a team of talented developers, especially passionate about the implementation of major challenges, in order to carry out our goals and collaborate with other teams on their goals.
 
-In the Crypto Broker Platform we are responsible for a large part of business transactions, while in the Chat Platform we are developing the back end. In each platform mentioned, we are involved in the development of Network Services and transactional plugins.
+* In the Crypto Broker Platform we are responsible for a large part of business transactions. 
+* In the Chat Platform We were involved in the back end development.
+* We are in charge of Tokenly and Artist development.
 
 #### Team Members:
 
 
-* **Manuel Perez [Team Leader]**<br/>
+* **Manuel Perez [Full Team Leader]**<br/>
 ---
     Email:   darkpriestrelative@gmail.com
     Skype:   darkestpriest
@@ -262,11 +265,17 @@ In the Crypto Broker Platform we are responsible for a large part of business tr
     Skype:   juanaso15
     Github:  https://github.com/Juanaso
 
-* **Alexander Jimenez [New Developer]**<br/>
+* **Alexander Jimenez [Veteran Developer]**<br/>
 ---
     Email:   alex_jimenez76@hotmail.com
     Skype:   alex_jimenez76
     Github:  https://github.com/alexanderejm
+
+* **Edicson Infante [New Part-Time Developer]**<br/>
+---
+    Email:   edicsonjosue18@gmail.com
+    Skype:   live:ejil_18
+    Github:  https://github.com/EdicsonInfante
     
 This is a team full of manga, anime, comics, sci-fi and Tolkien fans, also we represent the dark side of the force. We would be grateful for any help received, and anyone interested in joining the team will be welcome.
 
@@ -309,6 +318,12 @@ In the Crypto Broker Platform we are responsible for a large part of user level 
       Email:   roygufo@gmail.com
       Skype:   roy-epps
       Github:  https://github.com/RoyGF
+
+* **Orono Eleazar [New Part-Time Developer]**<br/>
+---
+      Email:   eorono@gmail.com
+      Skype:   eorono
+      Github:  https://github.com/eorono
 
 We are also amateur philosophers, passionate about esoteric topics and video games.
 
@@ -372,6 +387,11 @@ We are responsible of only one thing, making fermat a successfully project, shar
       Skype:   luis.fernando.torres.leon
       Github:  https://github.com/iLutor
 
+* **Eduardo Guerere [New Developer]** <br/>
+---
+      Email:   eduardoguerere@gmail.com
+      Skype:   eduardo.guerere
+      Github:  https://github.com/eduardoguerere
 
 <br>
 We don't mean to make fun of everything, just about the serious things.

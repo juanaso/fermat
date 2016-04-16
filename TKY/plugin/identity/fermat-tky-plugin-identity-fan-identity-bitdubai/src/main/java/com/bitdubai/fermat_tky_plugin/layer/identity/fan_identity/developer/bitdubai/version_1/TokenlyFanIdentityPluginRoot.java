@@ -27,6 +27,11 @@ import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfac
 import com.bitdubai.fermat_pip_api.layer.user.device_user.interfaces.DeviceUserManager;
 import com.bitdubai.fermat_tky_api.all_definitions.enums.ExternalPlatform;
 import com.bitdubai.fermat_tky_api.all_definitions.exceptions.IdentityNotFoundException;
+import com.bitdubai.fermat_tky_api.all_definitions.exceptions.ObjectNotSetException;
+import com.bitdubai.fermat_tky_api.all_definitions.exceptions.WrongTokenlyUserCredentialsException;
+import com.bitdubai.fermat_tky_api.all_definitions.interfaces.User;
+import com.bitdubai.fermat_tky_api.all_definitions.util.ObjectChecker;
+import com.bitdubai.fermat_tky_api.layer.external_api.exceptions.CantGetUserException;
 import com.bitdubai.fermat_tky_api.layer.external_api.interfaces.TokenlyApiManager;
 import com.bitdubai.fermat_tky_api.layer.identity.fan.exceptions.CantCreateFanIdentityException;
 import com.bitdubai.fermat_tky_api.layer.identity.fan.exceptions.CantGetFanIdentityException;
@@ -44,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -77,7 +83,7 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
     public static final String TOKENLY_FAN_IDENTITY_PROFILE_IMAGE = "tokenlyfanIdentityProfileImage";
     public static final String TOKENLY_FAN_IDENTITY_PRIVATE_KEY = "tokenlyfanIdentityPrivateKey";
 
-    private TokenlyIdentityFanManagerImpl identityArtistManager;
+    private TokenlyIdentityFanManagerImpl identityFanManager;
     /**
      * Default constructor
      */
@@ -88,7 +94,7 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
     public void start() throws CantStartPluginException {
         try {
             this.serviceStatus = ServiceStatus.STARTED;
-            identityArtistManager = new TokenlyIdentityFanManagerImpl(
+            identityFanManager = new TokenlyIdentityFanManagerImpl(
                     this.errorManager,
                     this.logManager,
                     this.pluginDatabaseSystem,
@@ -114,16 +120,14 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
 
     private void testCreateArtist(){
         try {
-            String alias = "Gabo";
+            String username = "perezilla";
             byte[] image = new byte[0];
-            String externalName = "El gabo fan";
-            String externalAccessToken = "El access token";
-            ExternalPlatform externalPlatform = ExternalPlatform.TOKENLY;
-            Fan fan = createFanIdentity(alias, image, externalName, externalAccessToken, externalPlatform);
+            String password = "milestone";
+            ExternalPlatform externalPlatform = ExternalPlatform.DEFAULT_EXTERNAL_PLATFORM;
+            Fan fan = createFanIdentity(username,image,password, externalPlatform);
             Fan fan1 = getFanIdentity(fan.getId());
             System.out.println("##############################\n");
-            System.out.println("fan1 = " + XMLParser.parseObject(new TokenlyFanIdentityImp(fan1.getAlias(), fan1.getId(), fan1.getPublicKey(), fan1.getProfileImage(), fan1.getExternalUsername(),
-                    fan1.getExternalAccesToken(), fan1.getExternalPlatform())));
+            System.out.println("fan1 = " + XMLParser.parseObject(new TokenlyFanIdentityImp(fan1.getId(),fan1.getTokenlyId(),fan1.getPublicKey(),fan1.getProfileImage(),fan1.getUsername(),fan1.getApiToken(),fan1.getApiSecretKey(), fan1.getUserPassword(),fan1.getExternalPlatform(),fan1.getEmail())));
         } catch (CantCreateFanIdentityException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -144,13 +148,21 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
 //    }
     @Override
     public List<Fan> listIdentitiesFromCurrentDeviceUser() throws CantListFanIdentitiesException {
-        return identityArtistManager.getIdentityFanFromCurrentDeviceUser();
+        return identityFanManager.getIdentityFanFromCurrentDeviceUser();
     }
 
     @Override
-    public Fan createFanIdentity(String alias, byte[] profileImage, String externalUserName, String externalAccessToken, ExternalPlatform externalPlatform) throws  CantCreateFanIdentityException {
-        if(tokenlyApiManager.isTokenlyAccessVaild(externalUserName,externalAccessToken)){
-            return identityArtistManager.createNewIdentityFan(alias, profileImage, externalUserName, externalAccessToken, externalPlatform);
+    public Fan createFanIdentity(String userName, byte[] profileImage, String externalPassword, ExternalPlatform externalPlatform) throws CantCreateFanIdentityException, WrongTokenlyUserCredentialsException {
+
+        User user=null;
+        try{
+            if(externalPlatform == ExternalPlatform.DEFAULT_EXTERNAL_PLATFORM)
+                user = tokenlyApiManager.validateTokenlyUser(userName, externalPassword);
+        } catch (CantGetUserException |InterruptedException | ExecutionException  e) {
+            e.printStackTrace();
+        }
+        if(user!=null){
+            return identityFanManager.createNewIdentityFan(user, externalPassword,profileImage, externalPlatform);
         }else{
             return null;
         }
@@ -158,13 +170,41 @@ public class TokenlyFanIdentityPluginRoot extends AbstractPlugin implements
 
 
     @Override
-    public void updateFanIdentity(String alias, UUID id,String publicKey, byte[] profileImage, String externalUserName, String externalAccessToken, ExternalPlatform externalPlatform) throws CantUpdateFanIdentityException {
-        identityArtistManager.updateIdentityFan(alias, id, publicKey, profileImage, externalUserName, externalAccessToken, externalPlatform);
+    public Fan updateFanIdentity(String userName, String password, UUID id, String publicKey, byte[] profileImage, ExternalPlatform externalPlatform) throws CantUpdateFanIdentityException, WrongTokenlyUserCredentialsException {
+        User user=null;
+        try{
+            if(externalPlatform == ExternalPlatform.DEFAULT_EXTERNAL_PLATFORM)
+                user = tokenlyApiManager.validateTokenlyUser(userName, password);
+        } catch (CantGetUserException |InterruptedException | ExecutionException  e) {
+            e.printStackTrace();
+        }
+        if(user != null)
+            return identityFanManager.updateIdentityFan(user,password, id, publicKey, profileImage,externalPlatform);
+        return null;
+    }
+
+    /**
+     * This method updates a Fan identity in database.
+     * This method can be used to update the plugin database when the Fan identity object include a
+     * new artist connected to be persisted.
+     * @param fan
+     * @throws CantUpdateFanIdentityException
+     */
+    public void updateFanIdentity(Fan fan) throws CantUpdateFanIdentityException{
+        try{
+            ObjectChecker.checkArgument(fan, "The Fan identity is null");
+            identityFanManager.updateIdentityFan(fan);
+        } catch (ObjectNotSetException e){
+            throw new CantUpdateFanIdentityException(
+                    e,
+                    "Cannot update the fan identity",
+                    "The fan identity is probably null");
+        }
     }
 
     @Override
     public Fan getFanIdentity(UUID id) throws CantGetFanIdentityException, IdentityNotFoundException {
-        return identityArtistManager.getIdentitFan(id);
+        return identityFanManager.getIdentitFan(id);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.bitdubai.android_core.app.common.version_1;
 
 /**
- * Created by mati on 2016.01.08..
+ * Created by Matias Furszyfer on 2016.01.08..
  */
 public class ApplicationConstants {
 
@@ -22,4 +22,5 @@ public class ApplicationConstants {
     public static final String INSTALLED_FERMAT_APP = "installedFermatApp";
     public static final String INTENT_APP_TYPE = "appType";
     public static final String RECENT_APPS = "recentApps";
+    public static final String WELCOME_SCREEN = "welcomeScreen";
 }

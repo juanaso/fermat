@@ -1,16 +1,19 @@
 package com.bitdubai.sub_app.wallet_manager.fragment;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.bitdubai.fermat_android_api.layer.definition.wallet.enums.FontType;
+import com.bitdubai.fermat_android_api.layer.definition.wallet.views.FermatTextView;
 import com.bitdubai.fermat_android_api.ui.enums.FermatRefreshTypes;
 import com.bitdubai.fermat_android_api.ui.expandableRecicler.ExpandableRecyclerAdapter;
 import com.bitdubai.fermat_android_api.ui.fragments.FermatWalletExpandableListFragment;
 import com.bitdubai.fermat_android_api.ui.interfaces.FermatListItemListeners;
-import com.bitdubai.fermat_android_api.ui.util.FermatDividerItemDecoration;
 import com.bitdubai.fermat_api.layer.all_definition.enums.Platforms;
+import com.bitdubai.fermat_api.layer.all_definition.enums.SubAppsPublicKeys;
 import com.bitdubai.fermat_api.layer.all_definition.navigation_structure.interfaces.DesktopAppSelector;
 import com.bitdubai.fermat_api.layer.all_definition.util.Version;
 import com.bitdubai.fermat_api.layer.dmp_engine.sub_app_runtime.enums.SubApps;
@@ -30,9 +33,8 @@ import java.util.Map;
 /**
  * Created by mati on 2016.03.14..
  */
-public class CommunitiesExpandibleFragment extends FermatWalletExpandableListFragment<GrouperItem,DesktopSession,ResourceProviderManager>
+public class CommunitiesExpandibleFragment extends FermatWalletExpandableListFragment<GrouperItem, DesktopSession, ResourceProviderManager>
         implements FermatListItemListeners<InstalledApp> {
-
 
 
     private View rootView;
@@ -60,14 +62,30 @@ public class CommunitiesExpandibleFragment extends FermatWalletExpandableListFra
     protected void initViews(View layout) {
         super.initViews(layout);
 
-        RecyclerView.ItemDecoration itemDecoration = new FermatDividerItemDecoration(getActivity(), R.drawable.divider_shape);
+        RecyclerView.ItemDecoration itemDecoration = new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                super.getItemOffsets(outRect, view, parent, state);
+                outRect.bottom = 12;
+            }
+        };
         recyclerView.addItemDecoration(itemDecoration);
+
+        layout.findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
+
+        ((FermatTextView)layout.findViewById(R.id.txt_title_communities)).setFont(FontType.CAVIAR_DREAMS);
+
 
 //        if (intalledAppsList.isEmpty()) {
 //            recyclerView.setVisibility(View.GONE);
 //            emptyListViewsContainer =(LinearLayout) layout.findViewById(R.id.empty);
 //            FermatAnimationsUtils.showEmpty(getActivity(), true, emptyListViewsContainer);
-            //emptyListViewsContainer.setVisibility(View.VISIBLE);
+        //emptyListViewsContainer.setVisibility(View.VISIBLE);
 //        }
     }
 
@@ -79,9 +97,10 @@ public class CommunitiesExpandibleFragment extends FermatWalletExpandableListFra
     @Override
     public ExpandableRecyclerAdapter getAdapter() {
         if (adapter == null) {
-            adapter = new CommunitiesExpandableAdapter(getActivity(), grouperList,getResources());
+            adapter = new CommunitiesExpandableAdapter(getActivity(), grouperList, getResources());
             // setting up event listeners
             adapter.setChildItemFermatEventListeners(this);
+            adapter.expandAllParents();
         }
         return adapter;
     }
@@ -112,15 +131,15 @@ public class CommunitiesExpandibleFragment extends FermatWalletExpandableListFra
     @Override
     public List<GrouperItem> getMoreDataAsync(FermatRefreshTypes refreshType, int pos) {
         ArrayList<GrouperItem> data = new ArrayList<>();
-        Map<Platforms,List<InstalledApp>> listMap = new HashMap<>();
+        Map<Platforms, List<InstalledApp>> listMap = new HashMap<>();
         try {
             for (InstalledApp installedApp : installedApps) {
-                if(listMap.containsKey(installedApp.getPlatform())){
+                if (listMap.containsKey(installedApp.getPlatform())) {
                     listMap.get(installedApp.getPlatform()).add(installedApp);
-                }else{
+                } else {
                     List<InstalledApp> list = new ArrayList<>();
                     list.add(installedApp);
-                    listMap.put(installedApp.getPlatform(),list);
+                    listMap.put(installedApp.getPlatform(), list);
                 }
 
             }
@@ -133,7 +152,7 @@ public class CommunitiesExpandibleFragment extends FermatWalletExpandableListFra
 //                if(!data.isEmpty()){
 //                    FermatAnimationsUtils.showEmpty(getActivity(),false,emptyListViewsContainer);
 //                }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return data;
@@ -146,7 +165,7 @@ public class CommunitiesExpandibleFragment extends FermatWalletExpandableListFra
 
     @Override
     public void onItemClickListener(InstalledApp data, int position) {
-        ((DesktopAppSelector)getActivity()).selectSubApp((com.bitdubai.fermat_api.layer.dmp_module.sub_app_manager.InstalledSubApp) data);
+        ((DesktopAppSelector) getActivity()).selectSubApp((com.bitdubai.fermat_api.layer.dmp_module.sub_app_manager.InstalledSubApp) data);
     }
 
     @Override
@@ -164,8 +183,11 @@ public class CommunitiesExpandibleFragment extends FermatWalletExpandableListFra
             swipeRefreshLayout.setRefreshing(false);
             if (result != null && result.length > 0) {
                 grouperList = (ArrayList) result[0];
-                if (adapter != null)
+                if (adapter != null) {
                     adapter.changeDataSet(grouperList);
+                    adapter.expandAllParents();
+                    adapter.expandParent(0);
+                }
             }
         }
     }
@@ -180,28 +202,69 @@ public class CommunitiesExpandibleFragment extends FermatWalletExpandableListFra
     }
 
 
-
-    private void loadProvisoryData(){
+    private void loadProvisoryData() {
         installedApps = new ArrayList<>();
 
-        com.bitdubai.fermat_api.layer.dmp_module.wallet_manager.InstalledApp installedSubApp = new InstalledSubApp(SubApps.CCP_INTRA_USER_COMMUNITY,null,null,"intra_user_community_sub_app","Wallet Users","public_key_intra_user_commmunity","intra_user_community_sub_app",new Version(1,0,0),Platforms.CRYPTO_CURRENCY_PLATFORM);
-        installedSubApp.setIconResource(R.drawable.cryptou_community);
-        installedSubApp.setBanner(R.drawable.crypto_wallet_user_community);
+        com.bitdubai.fermat_api.layer.dmp_module.wallet_manager.InstalledApp installedSubApp;
+
+        installedSubApp = new InstalledSubApp(
+                SubApps.CCP_INTRA_USER_COMMUNITY,
+                null,
+                null,
+                "intra_user_community_sub_app",
+                "Wallet Users",
+                SubAppsPublicKeys.CCP_COMMUNITY.getCode(),
+                "intra_user_community_sub_app",
+                new Version(1,0,0),
+                Platforms.CRYPTO_CURRENCY_PLATFORM);
+
+        installedSubApp.setIconResource(R.drawable.crypto_wallet_user_community);
+        installedSubApp.setBanner(R.drawable.wallet_user_community);
         installedApps.add(installedSubApp);
 
-        installedSubApp = new InstalledSubApp(SubApps.DAP_ASSETS_COMMUNITY_ISSUER, null, null, "sub-app-asset-community-issuer", "Asset Issuers", "public_key_dap_issuer_community", "sub-app-asset-community-issuer", new Version(1, 0, 0),Platforms.DIGITAL_ASSET_PLATFORM);
+        installedSubApp = new InstalledSubApp(
+                SubApps.DAP_ASSETS_COMMUNITY_ISSUER,
+                null,
+                null,
+                "sub-app-asset-community-issuer",
+                "Asset Issuers",
+                SubAppsPublicKeys.DAP_COMMUNITY_ISSUER.getCode(),
+                "sub-app-asset-community-issuer",
+                new Version(1, 0, 0),
+                Platforms.DIGITAL_ASSET_PLATFORM);
+
         installedSubApp.setIconResource(R.drawable.aissuer_community);
         installedSubApp.setBanner(R.drawable.asset_issuer_community);
         installedApps.add(installedSubApp);
 
-        installedSubApp = new InstalledSubApp(SubApps.DAP_ASSETS_COMMUNITY_USER, null, null, "sub-app-asset-community-user", "Asset Users", "public_key_dap_user_community", "sub-app-asset-community-user", new Version(1, 0, 0),Platforms.DIGITAL_ASSET_PLATFORM);
+        installedSubApp = new InstalledSubApp(
+                SubApps.DAP_ASSETS_COMMUNITY_USER,
+                null,
+                null,
+                "sub-app-asset-community-user",
+                "Asset Users",
+                SubAppsPublicKeys.DAP_COMMUNITY_USER.getCode(),
+                "sub-app-asset-community-user",
+                new Version(1, 0, 0),
+                Platforms.DIGITAL_ASSET_PLATFORM);
+
         installedSubApp.setIconResource(R.drawable.auser_community);
         installedSubApp.setBanner(R.drawable.asset_user_community);
         installedApps.add(installedSubApp);
 
-        installedSubApp = new InstalledSubApp(SubApps.DAP_ASSETS_COMMUNITY_REDEEM_POINT, null, null, "sub-app-asset-community-redeem-point", "Redeem Points", "public_key_dap_redeem_point_community", "sub-app-asset-community-redeem-point", new Version(1, 0, 0),Platforms.DIGITAL_ASSET_PLATFORM);
-        installedSubApp.setIconResource(R.drawable.reddem_point_community);
-        installedSubApp.setBanner(R.drawable.r_point_comuunity);
+        installedSubApp = new InstalledSubApp(
+                SubApps.DAP_ASSETS_COMMUNITY_REDEEM_POINT,
+                null,
+                null,
+                "sub-app-asset-community-redeem-point",
+                "Redeem Points",
+                SubAppsPublicKeys.DAP_COMMUNITY_REDEEM.getCode(),
+                "sub-app-asset-community-redeem-point",
+                new Version(1, 0, 0),
+                Platforms.DIGITAL_ASSET_PLATFORM);
+
+        installedSubApp.setIconResource(R.drawable.r_point_community);
+        installedSubApp.setBanner(R.drawable.redeem_community);
         installedApps.add(installedSubApp);
 
         installedSubApp = new InstalledSubApp(
@@ -210,16 +273,14 @@ public class CommunitiesExpandibleFragment extends FermatWalletExpandableListFra
                 null,
                 "sub_app_crypto_broker_community",
                 "Brokers",
-                "public_key_crypto_broker_community",
+                SubAppsPublicKeys.CBP_BROKER_COMMUNITY.getCode(),
                 "sub_app_crypto_broker_community",
-                new Version(1, 0, 0),
-                Platforms.CRYPTO_BROKER_PLATFORM);
-        installedSubApp.setIconResource(R.drawable.crypto_broker_community_final);
-        installedSubApp.setBanner(R.drawable.crypto_broker_community_final);
+                new Version(1, 0, 0)
+                ,Platforms.CRYPTO_BROKER_PLATFORM);
+
+        installedSubApp.setIconResource(R.drawable.crypto_broker_community);
+        installedSubApp.setBanner(R.drawable.broker_community);
         installedApps.add(installedSubApp);
-
-
-
 
         installedSubApp = new InstalledSubApp(
                 SubApps.CBP_CRYPTO_CUSTOMER_COMMUNITY,
@@ -227,15 +288,44 @@ public class CommunitiesExpandibleFragment extends FermatWalletExpandableListFra
                 null,
                 "sub_app_crypto_customer_community",
                 "Customers",
-                "public_key_crypto_customer_community",
+                SubAppsPublicKeys.CBP_CUSTOMER_COMMUNITY.getCode(),
                 "sub_app_crypto_customer_community",
                 new Version(1, 0, 0),
                 Platforms.CRYPTO_BROKER_PLATFORM);
-        installedSubApp.setIconResource(R.drawable.crypto_customer_community_final);
-        installedSubApp.setBanner(R.drawable.crypto_customer_community_final);
+
+        installedSubApp.setIconResource(R.drawable.crypto_customer_community);
+        installedSubApp.setBanner(R.drawable.customer_community);
+        installedApps.add(installedSubApp);
+
+        installedSubApp = new InstalledSubApp(
+                SubApps.ART_ARTIST_COMMUNITY,
+                null,
+                null,
+                "sub_app_artist_community",
+                "Artist",
+                SubAppsPublicKeys.ART_ARTIST_COMMUNITY.getCode(),
+                "sub_app_artist_community",
+                new Version(1, 0, 0),
+                Platforms.PLATFORM_ART);
+
+        installedSubApp.setIconResource(R.drawable.artist_banner);
+        installedSubApp.setBanner(R.drawable.artist_banner);
+        installedApps.add(installedSubApp);
+
+        installedSubApp = new InstalledSubApp(
+                SubApps.ART_FAN_COMMUNITY,
+                null,
+                null,
+                "sub_app_art_fan_community",
+                "Fans",
+                SubAppsPublicKeys.ART_FAN_COMMUNITY.getCode(),
+                "sub_app_art_fan_community",
+                new Version(1, 0, 0),
+                Platforms.PLATFORM_ART);
+
+        installedSubApp.setIconResource(R.drawable.communities_icon);
+        installedSubApp.setBanner(R.drawable.communities_bar);
         installedApps.add(installedSubApp);
 
     }
-
-
 }

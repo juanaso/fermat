@@ -27,11 +27,11 @@ import com.bitdubai.fermat_api.layer.all_definition.enums.UISource;
 import com.bitdubai.fermat_api.layer.all_definition.navigation_structure.enums.Activities;
 import com.bitdubai.fermat_api.layer.all_definition.navigation_structure.enums.Wallets;
 import com.bitdubai.fermat_api.layer.all_definition.settings.structure.SettingsManager;
+import com.bitdubai.fermat_api.layer.pip_engine.interfaces.ResourceProviderManager;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.crypto_wallet.BitcoinWalletSettings;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.crypto_wallet.exceptions.CantGetCryptoWalletException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.crypto_wallet.exceptions.CantListCryptoWalletIntraUserIdentityException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.crypto_wallet.interfaces.CryptoWallet;
-import com.bitdubai.fermat_ccp_api.layer.wallet_module.crypto_wallet.interfaces.CryptoWalletManager;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.crypto_wallet.interfaces.CryptoWalletWalletContact;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedUIExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedWalletExceptionSeverity;
@@ -55,7 +55,7 @@ import static android.widget.Toast.makeText;
  * @author Francisco Vásquez
  * @version 1.0
  */
-public class ContactDetailFragment extends AbstractFermatFragment implements View.OnClickListener {
+public class ContactDetailFragment extends AbstractFermatFragment<ReferenceWalletSession,ResourceProviderManager> implements View.OnClickListener {
 
 
     /**
@@ -79,7 +79,6 @@ public class ContactDetailFragment extends AbstractFermatFragment implements Vie
      */
     private CryptoWallet cryptoWallet;
     private ErrorManager errorManager;
-    private CryptoWalletManager cryptoWalletManager;
     private WalletSettingsManager walletSettingsManager;
 
     /**
@@ -103,8 +102,8 @@ public class ContactDetailFragment extends AbstractFermatFragment implements Vie
             addressIsTouch = false;
         }
     };
-    SettingsManager<BitcoinWalletSettings> settingsManager;
-    BlockchainNetworkType blockchainNetworkType;
+    private SettingsManager<BitcoinWalletSettings> settingsManager;
+    private BlockchainNetworkType blockchainNetworkType;
 
 
     public static ContactDetailFragment newInstance() {
@@ -117,16 +116,15 @@ public class ContactDetailFragment extends AbstractFermatFragment implements Vie
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-            referenceWalletSession = (ReferenceWalletSession) appSession;
+            referenceWalletSession = appSession;
             setHasOptionsMenu(true);
             cryptoWalletWalletContact = referenceWalletSession.getLastContactSelected();
             if(cryptoWalletWalletContact==null){
                 onBack(null);
             }
             //typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/CaviarDreams.ttf");
-            cryptoWalletManager = referenceWalletSession.getModuleManager();
             errorManager = appSession.getErrorManager();
-            cryptoWallet = cryptoWalletManager.getCryptoWallet();
+            cryptoWallet = appSession.getModuleManager();
             settingsManager = referenceWalletSession.getModuleManager().getSettingsManager();
 
             BitcoinWalletSettings bitcoinWalletSettings = null;
@@ -145,12 +143,9 @@ public class ContactDetailFragment extends AbstractFermatFragment implements Vie
             blockchainNetworkType = settingsManager.loadAndGetSettings(referenceWalletSession.getAppPublicKey()).getBlockchainNetworkType();
             System.out.println("Network Type"+blockchainNetworkType);
 
-        } catch (CantGetCryptoWalletException e) {
+        } catch (Exception e) {
             errorManager.reportUnexpectedWalletException(Wallets.CWP_WALLET_RUNTIME_WALLET_BITCOIN_WALLET_ALL_BITDUBAI, UnexpectedWalletExceptionSeverity.DISABLES_SOME_FUNCTIONALITY_WITHIN_THIS_FRAGMENT, e);
             makeText(getActivity(), "Oooops! recovering from system error",Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            makeText(getActivity(), "Oooops! recovering from system error",Toast.LENGTH_SHORT).show();
-            referenceWalletSession.getErrorManager().reportUnexpectedUIException(UISource.VIEW, UnexpectedUIExceptionSeverity.CRASH, e);
         }
 //        /* Load Wallet Contact */
 //        walletContact = CollectionUtils.find(getWalletContactList(), new Predicate<WalletContact>() {
@@ -254,7 +249,7 @@ public class ContactDetailFragment extends AbstractFermatFragment implements Vie
                     try {
                         if(!addressIsTouch) {
                             addressIsTouch=true;
-                            referenceWalletSession.getModuleManager().getCryptoWallet().sendAddressExchangeRequest(
+                            cryptoWallet.sendAddressExchangeRequest(
                                     cryptoWalletWalletContact.getActorName(),
                                     Actors.INTRA_USER,
                                     cryptoWalletWalletContact.getActorPublicKey(),
@@ -314,7 +309,7 @@ public class ContactDetailFragment extends AbstractFermatFragment implements Vie
                            if (cryptoWalletWalletContact.getReceivedCryptoAddress().get(blockchainNetworkType).getAddress()== null){
 
 
-                           referenceWalletSession.getModuleManager().getCryptoWallet().sendAddressExchangeRequest(
+                           cryptoWallet.sendAddressExchangeRequest(
                                    cryptoWalletWalletContact.getActorName(),
                                    Actors.INTRA_USER,
                                    cryptoWalletWalletContact.getActorPublicKey(),
@@ -347,7 +342,7 @@ public class ContactDetailFragment extends AbstractFermatFragment implements Vie
                        } catch (NullPointerException e) {
 
                            try {
-                               referenceWalletSession.getModuleManager().getCryptoWallet().sendAddressExchangeRequest(
+                               cryptoWallet.sendAddressExchangeRequest(
                                        cryptoWalletWalletContact.getActorName(),
                                        Actors.INTRA_USER,
                                        cryptoWalletWalletContact.getActorPublicKey(),
@@ -410,9 +405,7 @@ public class ContactDetailFragment extends AbstractFermatFragment implements Vie
       try
         {
             //update contact address
-            cryptoWalletManager = referenceWalletSession.getModuleManager();
-
-            cryptoWalletWalletContact = cryptoWalletManager.getCryptoWallet().findWalletContactById(UUID.fromString(code), referenceWalletSession.getIntraUserModuleManager().getPublicKey());
+            cryptoWalletWalletContact = cryptoWallet.findWalletContactById(UUID.fromString(code), referenceWalletSession.getIntraUserModuleManager().getPublicKey());
 
 
             if(cryptoWalletWalletContact.getReceivedCryptoAddress().get(blockchainNetworkType).getAddress() != null)

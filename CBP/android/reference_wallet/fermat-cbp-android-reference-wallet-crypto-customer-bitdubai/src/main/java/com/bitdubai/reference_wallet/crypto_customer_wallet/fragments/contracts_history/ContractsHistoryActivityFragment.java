@@ -76,6 +76,9 @@ public class ContractsHistoryActivityFragment extends FermatWalletListFragment<C
             errorManager = appSession.getErrorManager();
 
             contractHistoryList = (ArrayList) getMoreDataAsync(FermatRefreshTypes.NEW, 0);
+
+            // contractHistoryList = (ArrayList) TestData.getContractsHistory(null);
+
         } catch (Exception ex) {
             CommonLogger.exception(TAG, ex.getMessage(), ex);
             if (errorManager != null)
@@ -210,9 +213,6 @@ public class ContractsHistoryActivityFragment extends FermatWalletListFragment<C
             try {
 
                 data.addAll(walletManager.getContractsHistory(filterContractStatus, 20, 0));
-                //TODO: kill this next line when done testing
-                data.addAll(TestData.getContractsHistory(filterContractStatus));
-
 
             } catch (Exception ex) {
                 CommonLogger.exception(TAG, ex.getMessage(), ex);

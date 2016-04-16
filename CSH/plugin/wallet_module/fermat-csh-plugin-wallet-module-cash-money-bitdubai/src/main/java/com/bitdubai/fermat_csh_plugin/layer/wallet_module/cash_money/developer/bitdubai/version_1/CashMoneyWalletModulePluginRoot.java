@@ -25,7 +25,6 @@ import com.bitdubai.fermat_api.layer.osa_android.logger_system.LogManager;
 import com.bitdubai.fermat_cer_api.all_definition.interfaces.CurrencyPair;
 import com.bitdubai.fermat_cer_api.all_definition.interfaces.ExchangeRate;
 import com.bitdubai.fermat_cer_api.layer.provider.interfaces.CurrencyExchangeRateProviderManager;
-import com.bitdubai.fermat_cer_api.layer.provider.utils.DateHelper;
 import com.bitdubai.fermat_cer_api.layer.search.interfaces.CurrencyExchangeProviderFilterManager;
 import com.bitdubai.fermat_csh_api.all_definition.enums.BalanceType;
 import com.bitdubai.fermat_csh_api.all_definition.enums.TransactionType;
@@ -47,13 +46,11 @@ import com.bitdubai.fermat_csh_api.layer.csh_wallet_module.CashMoneyWalletPrefer
 import com.bitdubai.fermat_csh_api.layer.csh_wallet_module.exceptions.CantGetCashMoneyWalletBalancesException;
 import com.bitdubai.fermat_csh_api.layer.csh_wallet_module.interfaces.CashMoneyWalletModuleManager;
 import com.bitdubai.fermat_csh_plugin.layer.wallet_module.cash_money.developer.bitdubai.version_1.structure.CashMoneyWalletModuleManagerImpl;
-import com.bitdubai.fermat_csh_plugin.layer.wallet_module.cash_money.developer.bitdubai.version_1.structure.CurrencyPairImpl;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedPluginExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +89,7 @@ public class CashMoneyWalletModulePluginRoot extends AbstractPlugin implements L
 
 
     /* CER PLUGINS */
-    @NeededPluginReference(platform = Platforms.CURRENCY_EXCHANGE_RATE_PLATFORM, layer = Layers.SEARCH, plugin = Plugins.BITDUBAI_CER_PROVIDER_FILTER)
+    @NeededPluginReference(platform = Platforms.CURRENCY_EXCHANGE_RATE_PLATFORM, layer = Layers.SEARCH, plugin = Plugins.FILTER)
     private CurrencyExchangeProviderFilterManager providerFilter;
 
 
@@ -289,6 +286,8 @@ public class CashMoneyWalletModulePluginRoot extends AbstractPlugin implements L
                         UUID bitcoinVzlaKey = null;
                         UUID europCentBankKey = null;
                         UUID yahooKey = null;
+                        UUID bitfinex = null;
+                        UUID bter = null;
 
                         System.out.println("CERTEST - ---Listing ALL CER Providers and their supported currencies---");
                         for( Map.Entry<UUID, String> provider : providerFilter.getProviderNames().entrySet()){
@@ -303,10 +302,59 @@ public class CashMoneyWalletModulePluginRoot extends AbstractPlugin implements L
                                 europCentBankKey = provider.getKey();
                             if(provider.getValue().toString().equals("Yahoo"))
                                 yahooKey = provider.getKey();
+                            if(provider.getValue().toString().equals("Bitfinex"))
+                                bitfinex = provider.getKey();
+                            if(provider.getValue().toString().equals("Bter"))
+                                bter = provider.getKey();
                         }
                         System.out.println(" ");
 
+                        try{
+                            System.out.println("CERTEST - BTER ---Getting all ExchangeRates from Bter Provider");
+                            CurrencyExchangeRateProviderManager bitfinexProvider = providerFilter.getProviderReference(bter);
+                            for(CurrencyPair p : bitfinexProvider.getSupportedCurrencyPairs()){
+                                //p = new CurrencyPairImpl(p.getTo(), p.getFrom());
+                                System.out.println("CERTEST - BTER    Supported CurrencyPair! From: " + p.getFrom().getCode() + " To: " + p.getTo().getCode());
+                                ExchangeRate e = bitfinexProvider.getCurrentExchangeRate(p);
+                                System.out.println("CERTEST - BTER    Current exchange: (" + e.getTimestamp() + ") " + formatter.format(e.getTimestamp() * 1000)
+                                        + " Purchase: " + e.getPurchasePrice() + "Sale: " + e.getSalePrice());
 
+                                for(ExchangeRate er : bitfinexProvider.getQueriedExchangeRates(p)){
+                                    System.out.println("CERTEST - BTER    QueriedExchangeRates:");
+                                    System.out.println("CERTEST - BTER    Found exchange date: (" + er.getTimestamp() + ") " + formatter.format(er.getTimestamp()*1000)
+                                            + " Purchase: " + er.getPurchasePrice() + "Sale: " + er.getSalePrice());
+                                }
+                            }
+
+
+
+                        }catch (Exception e) {
+                            System.out.println("CERTEST - ECB - Exception!!! " + e.toString());
+                        }
+
+
+//                        try{
+//                            System.out.println("CERTEST - BF ---Getting all ExchangeRates from Bitfinex Provider");
+//                            CurrencyExchangeRateProviderManager bitfinexProvider = providerFilter.getProviderReference(bitfinex);
+//                            for(CurrencyPair p : bitfinexProvider.getSupportedCurrencyPairs()){
+//                                //p = new CurrencyPairImpl(p.getTo(), p.getFrom());
+//                                System.out.println("CERTEST - BF    Supported CurrencyPair! From: " + p.getFrom().getCode() + " To: " + p.getTo().getCode());
+//                                ExchangeRate e = bitfinexProvider.getCurrentExchangeRate(p);
+//                                System.out.println("CERTEST - BF    Current exchange: (" + e.getTimestamp() + ") " + formatter.format(e.getTimestamp() * 1000)
+//                                        + " Purchase: " + e.getPurchasePrice() + "Sale: " + e.getSalePrice());
+//
+//                                for(ExchangeRate er : bitfinexProvider.getQueriedExchangeRates(p)){
+//                                    System.out.println("CERTEST - BF    QueriedExchangeRates:");
+//                                    System.out.println("CERTEST - BF    Found exchange date: (" + er.getTimestamp() + ") " + formatter.format(er.getTimestamp()*1000)
+//                                            + " Purchase: " + er.getPurchasePrice() + "Sale: " + er.getSalePrice());
+//                                }
+//                            }
+//
+//
+//
+//                        }catch (Exception e) {
+//                            System.out.println("CERTEST - ECB - Exception!!! " + e.toString());
+//                        }
 
 
 //                        try{
@@ -364,41 +412,41 @@ public class CashMoneyWalletModulePluginRoot extends AbstractPlugin implements L
 
 
 
-                        //Usando un currencyPair, obtener referencias a los providers que provean ese currencyPair
-                        System.out.println("CERTEST - ---Listing CER Providers for USD/EUR using getProviderReferencesFromCurrencyPair()---");
-                        Collection<CurrencyExchangeRateProviderManager> filteredManagers = providerFilter.getProviderReferencesFromCurrencyPair(new CurrencyPairImpl(FiatCurrency.US_DOLLAR, FiatCurrency.EURO));
-                        for( CurrencyExchangeRateProviderManager p : filteredManagers)
-                            System.out.println("CERTEST -  Found provider: " + p.getProviderName());
+//                        //Usando un currencyPair, obtener referencias a los providers que provean ese currencyPair
+//                        System.out.println("CERTEST - ---Listing CER Providers for USD/EUR using getProviderReferencesFromCurrencyPair()---");
+//                        Collection<CurrencyExchangeRateProviderManager> filteredManagers = providerFilter.getProviderReferencesFromCurrencyPair(new CurrencyPairImpl(FiatCurrency.US_DOLLAR, FiatCurrency.EURO));
+//                        for( CurrencyExchangeRateProviderManager p : filteredManagers)
+//                            System.out.println("CERTEST -  Found provider: " + p.getProviderName());
 
 
-                        //Usando un currencyPair, obtener ID/Nombre de los providers que provean ese currencyPair
-                        System.out.println("CERTEST - ---Listing CER Providers for MXN/USD---");
-                        CurrencyPair mxnUsdCurrencyPair = new CurrencyPairImpl(FiatCurrency.MEXICAN_PESO, FiatCurrency.US_DOLLAR);
-                        for( Map.Entry<UUID, String> provider : providerFilter.getProviderNamesListFromCurrencyPair(mxnUsdCurrencyPair).entrySet())
-                            System.out.println("CERTEST - Found Provider! ID: " + provider.getKey() + " Name: " + provider.getValue());
-                        System.out.println(" ");
+//                        //Usando un currencyPair, obtener ID/Nombre de los providers que provean ese currencyPair
+//                        System.out.println("CERTEST - ---Listing CER Providers for MXN/USD---");
+//                        CurrencyPair mxnUsdCurrencyPair = new CurrencyPairImpl(FiatCurrency.MEXICAN_PESO, FiatCurrency.US_DOLLAR);
+//                        for( Map.Entry<UUID, String> provider : providerFilter.getProviderNamesListFromCurrencyPair(mxnUsdCurrencyPair).entrySet())
+//                            System.out.println("CERTEST - Found Provider! ID: " + provider.getKey() + " Name: " + provider.getValue());
+//                        System.out.println(" ");
 
 
-                        //Usando un currencyPair, obtener ID/Nombre de los providers que provean ese currencyPair
-                        System.out.println("CERTEST - ---Listing CER Providers for EUR/USD---");
-                        CurrencyPair eurUsdCurrencyPair = new CurrencyPairImpl(FiatCurrency.EURO, FiatCurrency.US_DOLLAR);
-                        for( Map.Entry<UUID, String> provider : providerFilter.getProviderNamesListFromCurrencyPair(eurUsdCurrencyPair).entrySet())
-                            System.out.println("CERTEST - Found Provider! ID: " + provider.getKey() + " Name: " + provider.getValue());
-                        System.out.println(" ");
+//                        //Usando un currencyPair, obtener ID/Nombre de los providers que provean ese currencyPair
+//                        System.out.println("CERTEST - ---Listing CER Providers for EUR/USD---");
+//                        CurrencyPair eurUsdCurrencyPair = new CurrencyPairImpl(FiatCurrency.EURO, FiatCurrency.US_DOLLAR);
+//                        for( Map.Entry<UUID, String> provider : providerFilter.getProviderNamesListFromCurrencyPair(eurUsdCurrencyPair).entrySet())
+//                            System.out.println("CERTEST - Found Provider! ID: " + provider.getKey() + " Name: " + provider.getValue());
+//                        System.out.println(" ");
 
 
-                        //Usando un currencyPair, obtener ID/Nombre de los providers que provean ese currencyPair
-                        //Luego con el ID de cada provider, obtener su referencia y con ella, obtener el exchangeRate
-                        System.out.println("CERTEST - ---Listing Providers and Current ExchangeRate for USD/VEF---");
-                        CurrencyPair usdVefCurrencyPair = new CurrencyPairImpl(FiatCurrency.US_DOLLAR, FiatCurrency.VENEZUELAN_BOLIVAR);
-                        for( Map.Entry<UUID, String> provider : providerFilter.getProviderNamesListFromCurrencyPair(usdVefCurrencyPair).entrySet()) {
-                            System.out.println("CERTEST - Found Provider! ID: " + provider.getKey() + " Name: " + provider.getValue());
-
-                            CurrencyExchangeRateProviderManager manager = providerFilter.getProviderReference(provider.getKey());
-                            ExchangeRate rate = manager.getCurrentExchangeRate(usdVefCurrencyPair);
-                            System.out.println("CERTEST - Also got Exchange rate! -  Purchase:" + rate.getPurchasePrice() + " Sale: " + rate.getSalePrice());
-                        }
-                        System.out.println(" ");
+//                        //Usando un currencyPair, obtener ID/Nombre de los providers que provean ese currencyPair
+//                        //Luego con el ID de cada provider, obtener su referencia y con ella, obtener el exchangeRate
+//                        System.out.println("CERTEST - ---Listing Providers and Current ExchangeRate for USD/VEF---");
+//                        CurrencyPair usdVefCurrencyPair = new CurrencyPairImpl(FiatCurrency.US_DOLLAR, FiatCurrency.VENEZUELAN_BOLIVAR);
+//                        for( Map.Entry<UUID, String> provider : providerFilter.getProviderNamesListFromCurrencyPair(usdVefCurrencyPair).entrySet()) {
+//                            System.out.println("CERTEST - Found Provider! ID: " + provider.getKey() + " Name: " + provider.getValue());
+//
+//                            CurrencyExchangeRateProviderManager manager = providerFilter.getProviderReference(provider.getKey());
+//                            ExchangeRate rate = manager.getCurrentExchangeRate(usdVefCurrencyPair);
+//                            System.out.println("CERTEST - Also got Exchange rate! -  Purchase:" + rate.getPurchasePrice() + " Sale: " + rate.getSalePrice());
+//                        }
+//                        System.out.println(" ");
 
 
 

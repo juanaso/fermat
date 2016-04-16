@@ -9,6 +9,7 @@ import com.bitdubai.fermat_api.layer.all_definition.enums.VaultType;
 import com.bitdubai.fermat_api.layer.all_definition.money.CryptoAddress;
 import com.bitdubai.fermat_ccp_api.layer.basic_wallet.common.enums.BalanceType;
 import com.bitdubai.fermat_ccp_api.layer.basic_wallet.common.enums.TransactionType;
+import com.bitdubai.fermat_ccp_api.layer.basic_wallet.common.exceptions.CantLoadWalletException;
 import com.bitdubai.fermat_ccp_api.layer.basic_wallet.loss_protected_wallet.interfaces.BitcoinLossProtectedWalletSpend;
 import com.bitdubai.fermat_ccp_api.layer.identity.intra_user.exceptions.CantCreateNewIntraWalletUserException;
 import com.bitdubai.fermat_ccp_api.layer.identity.intra_user.interfaces.IntraWalletUserIdentity;
@@ -23,6 +24,7 @@ import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exc
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantGetActorLossProtectedTransactionHistoryException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantGetAllIntraUserLossProtectedConnectionsException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantGetAllLossProtectedWalletContactsException;
+import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantGetBasicWalletExchangeProviderException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantGetCurrencyExchangeException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantGetCurrencyExchangeProviderException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantGetLossProtectedBalanceException;
@@ -37,6 +39,7 @@ import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exc
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantSaveLossProtectedTransactionDescriptionException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantSendLossProtectedCryptoException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantSendLossProtectedPaymentRequestException;
+import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantSetBasicWalletExchangeProviderException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.CantUpdateLossProtectedWalletContactException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.LossProtectedInsufficientFundsException;
 import com.bitdubai.fermat_ccp_api.layer.wallet_module.loss_protected_wallet.exceptions.LossProtectedPaymentRequestNotFoundException;
@@ -46,6 +49,8 @@ import com.bitdubai.fermat_ccp_api.layer.basic_wallet.common.exceptions.CantGetM
 
 import com.bitdubai.fermat_cer_api.all_definition.interfaces.ExchangeRate;
 import com.bitdubai.fermat_cer_api.layer.provider.interfaces.CurrencyExchangeRateProviderManager;
+import com.bitdubai.fermat_wpd_api.layer.wpd_middleware.wallet_manager.exceptions.CantListWalletsException;
+import com.bitdubai.fermat_wpd_api.layer.wpd_middleware.wallet_manager.interfaces.InstalledWallet;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -318,7 +323,8 @@ public interface LossProtectedWallet extends Serializable {
 
 
     void sendToWallet (long cryptoAmount,
-                       String walletPublicKey,
+                       String sendWalletPublicKey,
+                       String receivedWalletPublicKey,
                        String notes,
                        Actors deliveredToActorType,
                        ReferenceWallet sendingWallet,
@@ -327,19 +333,27 @@ public interface LossProtectedWallet extends Serializable {
 
 
     /**
-     * Throw the method <code>getBalance</code> you can get the balance of the wallet, having i count the type of balance that you need.
+     * Throw the method <code>getBalance</code> you can get the real balance of the wallet, having i count the type of balance that you need.
      *
-     * @param balanceType     type of balance that you need
      * @param walletPublicKey public key of the wallet which you're working with.
      *
      * @return the balance of the wallet in long format.
      *
      * @throws CantGetLossProtectedBalanceException if something goes wrong
      */
-    long getBalance(BalanceType balanceType,
-                    String      walletPublicKey,
+    long getRealBalance(String      walletPublicKey,
                     BlockchainNetworkType blockchainNetworkType) throws CantGetLossProtectedBalanceException;
 
+    /**
+     * Throw the method <code>getBalance</code> you can get the book balance of the wallet, having i count the type of balance that you need.
+     * @param walletPublicKey
+     * @param blockchainNetworkType
+     * @return
+     * @throws CantGetLossProtectedBalanceException
+     */
+
+    long geBookBalance(String      walletPublicKey,
+                        BlockchainNetworkType blockchainNetworkType) throws CantGetLossProtectedBalanceException;
 
     /**
      * Throw the method <code>getBalance</code> you can get the balance of the wallet, having i count the type of balance that you need and actual exange rate.
@@ -353,7 +367,7 @@ public interface LossProtectedWallet extends Serializable {
     long getBalance(BalanceType balanceType,
                     String walletPublicKey,
                     BlockchainNetworkType blockchainNetworkType,
-                    long exangeRate) throws CantGetLossProtectedBalanceException;
+                    String exangeRate) throws CantGetLossProtectedBalanceException;
 
     /**
      * Throw the method <code>getTransactions</code> you cant get all the transactions for an specific balance type.
@@ -461,7 +475,7 @@ public interface LossProtectedWallet extends Serializable {
      * @return
      * @throws CantListLossProtectedSpendingException
      */
-    List<BitcoinLossProtectedWalletSpend> listSpendingBlocksValue(String walletPublicKey,UUID transactionId) throws CantListLossProtectedSpendingException;
+    List<BitcoinLossProtectedWalletSpend> listSpendingBlocksValue(String walletPublicKey,UUID transactionId) throws CantListLossProtectedSpendingException, CantLoadWalletException;
 
     /**
      * Throw the method <code>setTransactionDescription</code> you can add or change a description for an existent transaction.
@@ -483,7 +497,7 @@ public interface LossProtectedWallet extends Serializable {
      * @param walletPublicKey
      * @return List of PaymentRequest object
      */
-    List<LossProtectedPaymentRequest> listSentPaymentRequest(String  walletPublicKey,int max,int offset) throws CantListLossProtectedSentPaymentRequestException;
+    List<LossProtectedPaymentRequest> listSentPaymentRequest(String  walletPublicKey,BlockchainNetworkType blockchainNetworkType,int max,int offset) throws CantListLossProtectedSentPaymentRequestException;
 
     /**
      *The method <code>listReceivedPaymentRequest</code> list the wallet receive payments request.
@@ -491,7 +505,7 @@ public interface LossProtectedWallet extends Serializable {
      * @param walletPublicKey
      * @return List of PaymentRequest object
      */
-    List<LossProtectedPaymentRequest> listReceivedPaymentRequest(String  walletPublicKey,int max,int offset)throws CantListLossProtectedReceivePaymentRequestException;
+    List<LossProtectedPaymentRequest> listReceivedPaymentRequest(String  walletPublicKey,BlockchainNetworkType blockchainNetworkType,int max,int offset)throws CantListLossProtectedReceivePaymentRequestException;
 
 
     /**
@@ -598,4 +612,15 @@ public interface LossProtectedWallet extends Serializable {
      * @throws CantGetCurrencyExchangeProviderException
      */
     Collection<CurrencyExchangeRateProviderManager> getExchangeRateProviderManagers() throws CantGetCurrencyExchangeProviderException;
+
+    /**
+     * Through the method <code>getInstalledWallets</code> you can get the list of wallets installed on platform
+     * @return List of InstalledWallet
+     * @throws CantListWalletsException
+     */
+    List<InstalledWallet> getInstalledWallets() throws CantListWalletsException;
+
+    UUID getExchangeProvider() throws CantGetBasicWalletExchangeProviderException;
+
+    void setExchangeProvider(UUID idProvider) throws CantSetBasicWalletExchangeProviderException;
 }

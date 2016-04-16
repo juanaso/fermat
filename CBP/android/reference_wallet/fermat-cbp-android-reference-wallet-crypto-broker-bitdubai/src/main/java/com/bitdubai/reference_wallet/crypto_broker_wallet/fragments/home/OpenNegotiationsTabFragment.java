@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.bitdubai.fermat_cbp_api.all_definition.constants.CBPBroadcasterConstants.CBW_NEGOTIATION_UPDATE_VIEW;
-import static com.bitdubai.fermat_cbp_api.all_definition.constants.CBPBroadcasterConstants.CBW_NEW_CONTRACT_UPDATE_VIEW;
+import static com.bitdubai.fermat_cbp_api.all_definition.constants.CBPBroadcasterConstants.CBW_CONTRACT_UPDATE_VIEW;
 
 
 /**
@@ -198,6 +198,13 @@ public class OpenNegotiationsTabFragment extends FermatWalletExpandableListFragm
     public void onItemClickListener(CustomerBrokerNegotiationInformation data, int position) {
         appSession.setData(CryptoBrokerWalletSession.NEGOTIATION_DATA, data);
         changeActivity(Activities.CBP_CRYPTO_BROKER_WALLET_OPEN_NEGOTIATION_DETAILS, appSession.getAppPublicKey());
+        /*
+        if(data.getStatus() == NegotiationStatus.SENT_TO_BROKER || data.getStatus() == NegotiationStatus.WAITING_FOR_BROKER){
+            changeActivity(Activities.CBP_CRYPTO_BROKER_WALLET_OPEN_NEGOTIATION_DETAILS, appSession.getAppPublicKey());
+        }else{
+            changeActivity(Activities.CBP_CRYPTO_BROKER_WALLET_CLOSE_NEGOTIATION_DETAILS_CLOSE_CONTRACT, appSession.getAppPublicKey());
+        }
+        */
     }
 
     @Override
@@ -239,7 +246,7 @@ public class OpenNegotiationsTabFragment extends FermatWalletExpandableListFragm
             case CBW_NEGOTIATION_UPDATE_VIEW:
                 onRefresh();
                 break;
-            case CBW_NEW_CONTRACT_UPDATE_VIEW:
+            case CBW_CONTRACT_UPDATE_VIEW:
                 onRefresh();
                 break;
         }

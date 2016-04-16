@@ -12,6 +12,7 @@ import com.bitdubai.fermat_api.layer.osa_android.broadcaster.BroadcasterType;
 import com.bitdubai.fermat_api.layer.osa_android.broadcaster.FermatBundle;
 
 import java.lang.ref.WeakReference;
+import java.util.UUID;
 
 /**
  * Created by Matias Furszyfer on 2016.02.04..
@@ -20,9 +21,11 @@ public class BroadcastManager implements BroadcasterInterface {
 
     private static final String TAG = "broadcaster-manager";
     WeakReference<FermatActivity> fermatActivity;
+    private final UUID id;
 
     public BroadcastManager(FermatActivity fermatActivity) {
         this.fermatActivity = new WeakReference<FermatActivity>(fermatActivity);
+        id = UUID.randomUUID();
     }
 
     public void setFermatActivity(FermatActivity fermatActivity) {
@@ -126,7 +129,8 @@ public class BroadcastManager implements BroadcasterInterface {
     }
 
     @Override
-    public void publish(BroadcasterType broadcasterType, FermatBundle bundle) {
+    public int publish(BroadcasterType broadcasterType, FermatBundle bundle) {
+        int id = 0;
         try {
             switch (broadcasterType){
                 case UPDATE_VIEW:
@@ -136,13 +140,19 @@ public class BroadcastManager implements BroadcasterInterface {
                     fermatActivity.get().notificateBroadcast(null,bundle);
                     break;
                 case NOTIFICATION_PROGRESS_SERVICE:
-                    fermatActivity.get().notificateProgressBroadcast(bundle);
+                    id = (fermatActivity.get()!=null)?fermatActivity.get().notificateProgressBroadcast(bundle):0;
                     break;
             }
         }catch (Exception e){
             Log.e(TAG,"Cant broadcast excepcion");
             e.printStackTrace();
         }
+        return id;
+    }
+
+    @Override
+    public UUID getId() {
+        return id;
     }
 
     private void updateView(FermatBundle bundle) {
@@ -171,6 +181,7 @@ public class BroadcastManager implements BroadcasterInterface {
         if(adapter!=null) {
             for (AbstractFermatFragment fragment :adapter.getLstCurrentFragments()){
                 fragment.onUpdateViewHandler(appCode,code);
+                fragment.onUpdateView(code);
                 fragment.onUpdateViewUIThred(code);
             }
         }

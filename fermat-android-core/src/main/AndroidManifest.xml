@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bitdubai.fermat">
 
-    <uses-sdk android:minSdkVersion="17" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -19,7 +17,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
+        android:maxSdkVersion="23" />
 
     <application
         android:name="com.bitdubai.android_core.app.ApplicationSession"
@@ -99,7 +97,7 @@
 
         </activity>
 
-        <service android:name="com.bitdubai.android_core.app.NotificationService"/>
+        <service android:name="com.bitdubai.android_core.app.common.version_1.notifications.NotificationService"/>
 
 
         <activity
@@ -137,10 +135,11 @@
 
         <service android:name="com.bitdubai.android_core.app.common.version_1.communication.CommunicationService"
             android:label="CommService"
-            android:exported="true">
+            android:exported="true"
+            >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
                 <!-- Service name -->
                 <action android:name="org.fermat.COMM_SERVICE" />
             </intent-filter>
@@ -148,7 +147,10 @@
 
         <activity android:name="com.bitdubai.android_core.app.LoadingScreenActivity"
             android:theme="@style/AppThemeDesktop"
-            ></activity>
+            />
+
+        <service android:name="com.bitdubai.android_core.app.common.version_1.apps_manager.FermatAppsManagerService"/>
+        <service android:name="com.bitdubai.android_core.app.common.version_1.communication.client_system_broker.ClientSystemBrokerService"/>
 
     </application>
 </manifest>

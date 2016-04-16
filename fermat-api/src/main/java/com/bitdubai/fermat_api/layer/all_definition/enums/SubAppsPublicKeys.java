@@ -12,6 +12,7 @@ public enum SubAppsPublicKeys implements FermatEnum {
 
     //TODO CHT Platform
     CHT_OPEN_CHAT               ("public_key_cht_chat"),
+
     //TODO CBP Platform
     CBP_BROKER_COMMUNITY        ("public_key_crypto_broker_community"),
     CBP_BROKER_IDENTITY         ("sub_app_crypto_broker_identity"),
@@ -37,8 +38,19 @@ public enum SubAppsPublicKeys implements FermatEnum {
     DAP_FACTORY                   ("public_key_dap_factory"),
     //TODO PIP Platform
     PIP_DEVELOPER               ("public_key_pip_developer_sub_app"),
-    //TODO ART PLATAFORM
-    ART_ARTIST_IDENTITY          ("public_key_art_artist_identity")
+    SETTINGS                    ("public_key_settings"),
+    //TODO ART PLATFORM
+    ART_ARTIST_IDENTITY         ("public_key_art_artist_identity"),
+    ART_FAN_IDENTITY            ("public_key_art_fan_identity"),
+    ART_FAN_COMMUNITY           ("public_key_art_fan_community"),
+    ART_ARTIST_COMMUNITY        ("sub_app_art_artist_community"),
+    ART_MUSIC_PLAYER            ("public_key_art_music_player"),
+
+    //TODO TKY PLATFORM
+    TKY_ARTIST_IDENTITY         ("public_key_tky_artist_identity"),
+    TKY_FAN_IDENTITY            ("sub_app_tky_fan_create_identity"),
+    CHT_CHAT_IDENTITY           ("public_key_cht_identity_chat"),
+
 
     ;
 
@@ -54,6 +66,7 @@ public enum SubAppsPublicKeys implements FermatEnum {
 
             //TODO CHT Platform
             case "public_key_cht_chat":                     return CHT_OPEN_CHAT            ;
+            case "public_key_cht_identity_chat":             return CHT_CHAT_IDENTITY  ;
             //TODO CBP Platform
             case "sub_app_crypto_broker_identity":          return CBP_BROKER_IDENTITY      ;
             case "sub_app_crypto_customer_identity":        return CBP_CUSTOMER_IDENTITY    ;
@@ -79,10 +92,16 @@ public enum SubAppsPublicKeys implements FermatEnum {
             case "public_key_dap_factory":                  return DAP_FACTORY              ;
             //TODO PIP Platform
             case "public_key_pip_developer_sub_app":        return PIP_DEVELOPER            ;
-
+            case "public_key_settings":                     return SETTINGS                 ;
             //TODO ART PLATAFORM
             case "public_key_art_artist_identity":        return ART_ARTIST_IDENTITY        ;
+            case "public_key_art_fan_identity":        return ART_FAN_IDENTITY        ;
+            case "sub_app_art_artist_community":            return ART_ARTIST_COMMUNITY;
+            case "public_key_art_music_player":            return ART_MUSIC_PLAYER;
 
+            //TODO TKY PLATAFORM
+            case "public_key_tky_artist_identity":        return TKY_ARTIST_IDENTITY        ;
+            case "sub_app_tky_fan_create_identity":       return TKY_FAN_IDENTITY           ;
             default:
                 throw new InvalidParameterException(
                         "Code Received: " + code,

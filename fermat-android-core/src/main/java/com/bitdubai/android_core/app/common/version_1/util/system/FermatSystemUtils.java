@@ -3,7 +3,6 @@ package com.bitdubai.android_core.app.common.version_1.util.system;
 import com.bitdubai.android_core.app.ApplicationSession;
 import com.bitdubai.android_core.app.common.version_1.provisory.P2PAppsRuntimeManager;
 import com.bitdubai.android_core.app.common.version_1.provisory.SubAppManagerProvisory;
-import com.bitdubai.fermat_android_api.engine.FermatAppsManager;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.exceptions.CantGetErrorManagerException;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.exceptions.CantGetModuleManagerException;
 import com.bitdubai.fermat_api.layer.all_definition.common.system.exceptions.CantGetResourcesManagerException;
@@ -31,6 +30,7 @@ import com.bitdubai.fermat_api.layer.all_definition.settings.structure.SettingsM
 import com.bitdubai.fermat_api.layer.all_definition.util.Version;
 import com.bitdubai.fermat_api.layer.dmp_engine.sub_app_runtime.SubAppRuntimeManager;
 import com.bitdubai.fermat_api.layer.dmp_module.AppManager;
+import com.bitdubai.fermat_api.layer.dmp_module.AppManagerSettings;
 import com.bitdubai.fermat_api.layer.dmp_module.DesktopManager;
 import com.bitdubai.fermat_api.layer.dmp_module.sub_app_manager.SubAppManager;
 import com.bitdubai.fermat_api.layer.dmp_module.wallet_manager.WalletManager;
@@ -39,7 +39,6 @@ import com.bitdubai.fermat_api.layer.engine.runtime.RuntimeManager;
 import com.bitdubai.fermat_api.layer.modules.common_classes.ActiveActorIdentityInformation;
 import com.bitdubai.fermat_api.layer.modules.exceptions.ActorIdentityNotSelectedException;
 import com.bitdubai.fermat_api.layer.modules.exceptions.CantGetSelectedActorIdentityException;
-import com.bitdubai.fermat_api.layer.modules.interfaces.FermatSettings;
 import com.bitdubai.fermat_api.layer.modules.interfaces.ModuleManager;
 import com.bitdubai.fermat_api.layer.pip_engine.desktop_runtime.DesktopRuntimeManager;
 import com.bitdubai.fermat_api.layer.pip_engine.interfaces.ResourceProviderManager;
@@ -59,15 +58,15 @@ import java.util.UUID;
  */
 public class FermatSystemUtils {
 
-    /**
-     * Get the application manager
-     *
-     * @return
-     */
-
-    public static FermatAppsManager getFermatAppManager(){
-        return ApplicationSession.getInstance().getFermatAppsManager();
-    }
+//    /**
+//     * Get the application manager
+//     *
+//     * @return
+//     */
+//
+//    public static FermatAppsManager getFermatAppManager(){
+//        return ApplicationSession.getInstance().getFermatAppsManager();
+//    }
 
 
 
@@ -444,7 +443,7 @@ public class FermatSystemUtils {
         return new DesktopManager() {
 
             @Override
-            public SettingsManager<FermatSettings> getSettingsManager() {
+            public SettingsManager<AppManagerSettings> getSettingsManager() {
                 return null;
             }
 

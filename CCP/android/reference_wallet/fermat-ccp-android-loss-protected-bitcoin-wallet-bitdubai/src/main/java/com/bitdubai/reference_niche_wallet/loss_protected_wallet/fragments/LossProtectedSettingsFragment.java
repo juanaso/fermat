@@ -69,7 +69,7 @@ public class LossProtectedSettingsFragment extends FermatPreferenceFragment<Loss
     @Override
     protected List<PreferenceSettingsItem> setSettingsItems() {
         BlockchainNetworkType blockchainNetworkType= null;
-        UUID exchangeProviderIdSettings = null;
+        UUID exchangeProviderId = null;
         List<PreferenceSettingsItem> list = new ArrayList<>();
         try{
 
@@ -78,7 +78,10 @@ public class LossProtectedSettingsFragment extends FermatPreferenceFragment<Loss
 
             list.add(new PreferenceSettingsSwithItem(1,"Enabled Notifications",bitcoinWalletSettings.getNotificationEnabled()));
 
-        if (bitcoinWalletSettings.getBlockchainNetworkType()!=null)
+            list.add(new PreferenceSettingsSwithItem(2,"Enabled Loss Protected",bitcoinWalletSettings.getNotificationEnabled()));
+
+
+            if (bitcoinWalletSettings.getBlockchainNetworkType()!=null)
             blockchainNetworkType =  bitcoinWalletSettings.getBlockchainNetworkType();
 
         List<PreferenceSettingsTextPlusRadioItem> strings = new ArrayList<PreferenceSettingsTextPlusRadioItem>();
@@ -91,8 +94,8 @@ public class LossProtectedSettingsFragment extends FermatPreferenceFragment<Loss
 
             //Exchange Rate Provider
 
-            if (bitcoinWalletSettings.getExchangeProvider()!=null)
-                exchangeProviderIdSettings =  bitcoinWalletSettings.getExchangeProvider();
+            if (cryptoWallet.getExchangeProvider()!=null)
+                exchangeProviderId=  cryptoWallet.getExchangeProvider();
 
             List<PreferenceSettingsTextPlusRadioItem> stringsProviders = new ArrayList<PreferenceSettingsTextPlusRadioItem>();
 
@@ -102,7 +105,7 @@ public class LossProtectedSettingsFragment extends FermatPreferenceFragment<Loss
             int position = 11;
             for (CurrencyExchangeRateProviderManager provider :  providers)
             {
-                stringsProviders.add(new PreferenceSettingsTextPlusRadioItem(position,provider.getProviderName(),(provider.getProviderId().equals(exchangeProviderIdSettings)) ? true : false));
+                stringsProviders.add(new PreferenceSettingsTextPlusRadioItem(position,provider.getProviderName(),(provider.getProviderId().equals(exchangeProviderId)) ? true : false));
                 position++;
             }
 
@@ -117,6 +120,16 @@ public class LossProtectedSettingsFragment extends FermatPreferenceFragment<Loss
         }
 
         return list;
+    }
+
+    @Override
+    public void dialogOptionSelected(String item, int position) {
+
+    }
+
+    @Override
+    public void optionSelected(PreferenceSettingsItem preferenceSettingsItem, int position) {
+
     }
 
     /**
@@ -188,12 +201,12 @@ public class LossProtectedSettingsFragment extends FermatPreferenceFragment<Loss
                 //get providers list
                 List<CurrencyExchangeRateProviderManager> providers = new ArrayList(cryptoWallet.getExchangeRateProviderManagers());
 
-                bitcoinWalletSettings.setExchangeProvider(providers.get(0).getProviderId());
+                cryptoWallet.setExchangeProvider(providers.get(0).getProviderId());
 
                 for (CurrencyExchangeRateProviderManager provider :  providers)
                 {
                     if(provider.getProviderName().equals(preferenceSettingsTextPlusRadioItem.getText()))
-                        bitcoinWalletSettings.setExchangeProvider(provider.getProviderId());
+                        cryptoWallet.setExchangeProvider(provider.getProviderId());
                 }
             }
 
@@ -208,10 +221,11 @@ public class LossProtectedSettingsFragment extends FermatPreferenceFragment<Loss
     }
 
     @Override
+    public void onSettingsTouched(String item, int position) {}
+
+    @Override
     public void onSettingsChanged(PreferenceSettingsItem preferenceSettingsItem, int position, boolean isChecked) {
-
         try {
-
             try {
                 bitcoinWalletSettings = settingsManager.loadAndGetSettings(referenceWalletSession.getAppPublicKey());
             } catch (CantGetSettingsException e) {
@@ -226,7 +240,10 @@ public class LossProtectedSettingsFragment extends FermatPreferenceFragment<Loss
                 bitcoinWalletSettings.setNotificationEnabled(isChecked);
             }
 
-
+            if (preferenceSettingsItem.getId() == 2){
+                //enable Loss Protected
+                bitcoinWalletSettings.setLossProtectedEnabled(isChecked);
+            }
 
             try {
                 settingsManager.persistSettings(referenceWalletSession.getAppPublicKey(), bitcoinWalletSettings);
@@ -238,7 +255,6 @@ public class LossProtectedSettingsFragment extends FermatPreferenceFragment<Loss
 
     }
 
-
     @Override
     public int getBackgroundColor() {
         return Color.WHITE;
@@ -248,6 +264,4 @@ public class LossProtectedSettingsFragment extends FermatPreferenceFragment<Loss
     public int getBackgroundAlpha() {
         return 95;
     }
-
-
 }
