@@ -2747,6 +2747,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeSubApp = new RuntimeSubApp();
         runtimeSubApp.setType(SubApps.CBP_CRYPTO_CUSTOMER_IDENTITY);
         runtimeSubApp.setPublicKey(publicKey);
+        runtimeSubApp.setPlatform(Platforms.CRYPTO_BROKER_PLATFORM);
         listSubApp.put(runtimeSubApp.getPublicKey(), runtimeSubApp);
 
         // Activity: List of identities
@@ -2930,6 +2931,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         RuntimeSubApp subAppBrokerCommunity = new RuntimeSubApp();
         subAppBrokerCommunity.setType(SubApps.CBP_CRYPTO_BROKER_COMMUNITY);
         String communityPublicKey = SubAppsPublicKeys.CBP_BROKER_COMMUNITY.getCode();
+        subAppBrokerCommunity.setPlatform(Platforms.CRYPTO_BROKER_PLATFORM);
         subAppBrokerCommunity.setPublicKey(communityPublicKey);
 
         //Side Menu definition
@@ -3097,6 +3099,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         subAppCustomerCommunity.setType(SubApps.CBP_CRYPTO_CUSTOMER_COMMUNITY);
         String communityPublicKey = SubAppsPublicKeys.CBP_CUSTOMER_COMMUNITY.getCode();
         subAppCustomerCommunity.setPublicKey(communityPublicKey);
+        subAppCustomerCommunity.setPlatform(Platforms.CRYPTO_BROKER_PLATFORM);
 
         //Side Menu definition
         runtimeSideMenu = new SideMenu();
@@ -4078,7 +4081,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setColor("#ffffff");
 
         statusBar = new StatusBar();
-        statusBar.setColor("#ffffff");
+        statusBar.setColor("#000000");
         runtimeActivity.setStatusBar(statusBar);
         runtimeSubApp.addActivity(runtimeActivity);
         runtimeSubApp.changeActualStartActivity(Activities.ART_MUSIC_PLAYER_MAIN_ACTIVITY.getCode());

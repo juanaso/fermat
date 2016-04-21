@@ -30,6 +30,7 @@ import com.bitdubai.fermat_api.layer.osa_android.broadcaster.FermatBundle;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.enums.UnexpectedWalletExceptionSeverity;
 import com.bitdubai.fermat_pip_api.layer.platform_service.error_manager.interfaces.ErrorManager;
 import com.bitdubai.fermat_tky_api.all_definitions.enums.BroadcasterNotificationType;
+import com.bitdubai.fermat_tky_api.all_definitions.enums.HTTPErrorResponse;
 import com.bitdubai.fermat_tky_api.all_definitions.enums.SongStatus;
 import com.bitdubai.fermat_tky_api.layer.external_api.interfaces.music.Song;
 import com.bitdubai.fermat_tky_api.layer.identity.fan.exceptions.CantListFanIdentitiesException;
@@ -291,7 +292,7 @@ public class SongFragment extends AbstractFermatFragment {
        List<String> listComposerAndSongNameOnView=new ArrayList<>();
         for(SongItems songitems : items){
                if(!listComposerAndSongNameOnView.contains(songitems.getArtist_name()+"@#@#"+songitems.getSong_name())){
-                   //   System.out.println("TKY_VIEW songs"+songitems.getArtist_name()+"@#@#"+songitems.getSong_name());
+                   //   System.out.println("TKY_VIEW songs"+songitems.getUsername()+"@#@#"+songitems.getSong_name());
                    listComposerAndSongNameOnView.add(songitems.getArtist_name()+"@#@#"+songitems.getSong_name());
                }
         }
@@ -317,7 +318,7 @@ public class SongFragment extends AbstractFermatFragment {
 
         for(SongItems songitems : items){
             if(!listComposerAndSongNameOnView.contains(songitems.getArtist_name()+"@#@#"+songitems.getSong_name())){
-             //   System.out.println("TKY_VIEW songs"+songitems.getArtist_name()+"@#@#"+songitems.getSong_name());
+             //   System.out.println("TKY_VIEW songs"+songitems.getUsername()+"@#@#"+songitems.getSong_name());
                 listComposerAndSongNameOnView.add(songitems.getArtist_name()+"@#@#"+songitems.getSong_name());
             }
         }
@@ -589,7 +590,8 @@ public class SongFragment extends AbstractFermatFragment {
     Float for the onprogressupdate
     Boolen for the  onPostExecute   */
     public class DownloadThreadClass extends AsyncTask<Void, Float, Boolean> {
-    int position;
+        int position;
+        HTTPErrorResponse httpErrorResponse;
         UUID songId;
         Fan fanIdentity = getFanIdentity();
         /**
@@ -638,7 +640,7 @@ public class SongFragment extends AbstractFermatFragment {
                         }
 
                     } catch (CantDownloadSongException e) {
-                        e.printStackTrace();
+                        httpErrorResponse = e.getHttpErrorResponse();
                     } catch (CantUpdateSongStatusException e) {
                         e.printStackTrace();
                     } catch (CantUpdateSongDevicePathException e) {
@@ -672,6 +674,14 @@ public class SongFragment extends AbstractFermatFragment {
                 Toast.makeText(
                         view.getContext(),
                         "Cannot load a Fan identity",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+            //If exists any error from Tokenly API, I'll notify to user.
+            if(httpErrorResponse!=null){
+                Toast.makeText(
+                        view.getContext(),
+                        httpErrorResponse.getErrorResponse(),
                         Toast.LENGTH_SHORT)
                         .show();
             }
@@ -862,9 +872,9 @@ public class SongFragment extends AbstractFermatFragment {
             String databaseInfo;
 
             for(SongItems songitems : listSongInView){
-                if(!listComposerAndSongNameOnView.contains(songitems.getArtist_name()+"@#@#"+songitems.getSong_name())){
-                    System.out.println("TKY_VIEW songs"+songitems.getArtist_name()+"@#@#"+songitems.getSong_name());
-                    listComposerAndSongNameOnView.add(songitems.getArtist_name()+"@#@#"+songitems.getSong_name());
+                if(!listComposerAndSongNameOnView.contains(songitems.getUsername()+"@#@#"+songitems.getSong_name())){
+                    System.out.println("TKY_VIEW songs"+songitems.getUsername()+"@#@#"+songitems.getSong_name());
+                    listComposerAndSongNameOnView.add(songitems.getUsername()+"@#@#"+songitems.getSong_name());
                 }
             }
             if(listAvailableSongs.size()>listComposerAndSongNameOnView.size()){

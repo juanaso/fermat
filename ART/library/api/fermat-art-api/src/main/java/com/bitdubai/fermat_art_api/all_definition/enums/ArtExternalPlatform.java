@@ -12,6 +12,7 @@ import java.util.List;
 public enum ArtExternalPlatform implements FermatEnum {
 
     TOKENLY("TKY","Tokenly"),
+    UNDEFINED("UNDEF","Undefined"),
     ;
 
     String code;
@@ -60,8 +61,8 @@ public enum ArtExternalPlatform implements FermatEnum {
     }
 
     /**
-     * Gets the default network type selected for this platform.
-     * @return the default BlockchainNetworkType
+     * Gets the default external platform.
+     * @return the default ArtExternalPlatform
      */
     public static ArtExternalPlatform getDefaultExternalPlatform(){
         return DEFAULT_EXTERNAL_PLATFORM;

@@ -22,10 +22,12 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseS
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_api.layer.osa_android.logger_system.LogLevel;
 import com.bitdubai.fermat_api.layer.osa_android.logger_system.LogManager;
+import com.bitdubai.fermat_art_api.all_definition.enums.ArtExternalPlatform;
 import com.bitdubai.fermat_art_api.all_definition.exceptions.CantHideIdentityException;
 import com.bitdubai.fermat_art_api.all_definition.exceptions.CantPublishIdentityException;
 import com.bitdubai.fermat_art_api.all_definition.exceptions.IdentityNotFoundException;
 import com.bitdubai.fermat_art_api.all_definition.interfaces.ArtIdentity;
+import com.bitdubai.fermat_art_api.layer.actor_network_service.exceptions.CantExposeIdentitiesException;
 import com.bitdubai.fermat_art_api.layer.actor_network_service.exceptions.CantExposeIdentityException;
 import com.bitdubai.fermat_art_api.layer.actor_network_service.exceptions.CantListArtistsException;
 import com.bitdubai.fermat_art_api.layer.actor_network_service.interfaces.ActorSearch;
@@ -113,12 +115,33 @@ public class ArtistIdentityPluginRoot extends AbstractPlugin implements
                     this.deviceUserManager,
                     this.artistManager);
 
+            exposeIdentities();
+
             System.out.println("############\n ART IDENTITY ARTIST STARTED\n");
             //testCreateArtist();
             //testAskForConnection();
         } catch (Exception e) {
             errorManager.reportUnexpectedPluginException(Plugins.ARTIST_IDENTITY, UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN, e);
             throw new CantStartPluginException(e, Plugins.ARTIST_IDENTITY);
+        }
+    }
+
+    private void exposeIdentities(){
+        ArrayList<ArtistExposingData> artistExposingDatas = new ArrayList<>();
+        try {
+            for (Artist artist :
+                    listIdentitiesFromCurrentDeviceUser()) {
+                artistExposingDatas.add(new ArtistExposingData(
+                        artist.getPublicKey(),
+                        artist.getAlias(),
+                        artist.getProfileImage()
+                ));
+            }
+            artistManager.exposeIdentities(artistExposingDatas);
+        } catch (CantListArtistIdentitiesException e) {
+            errorManager.reportUnexpectedPluginException(Plugins.ARTIST_IDENTITY, UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN, e);
+        } catch (CantExposeIdentitiesException e) {
+            errorManager.reportUnexpectedPluginException(Plugins.ARTIST_IDENTITY, UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN, e);
         }
     }
 
@@ -133,11 +156,11 @@ public class ArtistIdentityPluginRoot extends AbstractPlugin implements
         try {
 
             tokenlyArtistIdentityManager.createArtistIdentity(alias, image, password, externalPlatformTokenly, exposureLevelTokenly, artistAcceptConnectionsTypeTokenly);
-            HashMap<ExternalPlatform, HashMap<UUID,String>> externalIdentites = listExternalIdentitiesFromCurrentDeviceUser();
-            Iterator<Map.Entry<ExternalPlatform, HashMap<UUID, String>>> entries = externalIdentites.entrySet().iterator();
+            HashMap<ArtExternalPlatform, HashMap<UUID,String>> externalIdentites = listExternalIdentitiesFromCurrentDeviceUser();
+            Iterator<Map.Entry<ArtExternalPlatform, HashMap<UUID, String>>> entries = externalIdentites.entrySet().iterator();
             UUID externalIdentityID = null;
             while (entries.hasNext()) {
-                Map.Entry<ExternalPlatform, HashMap<UUID, String>> entry = entries.next();
+                Map.Entry<ArtExternalPlatform, HashMap<UUID, String>> entry = entries.next();
                 HashMap<UUID, String> artists = entry.getValue();
                 Iterator<Map.Entry<UUID, String>> entiesSet = artists.entrySet().iterator();
                 while(entiesSet.hasNext()){
@@ -187,15 +210,15 @@ public class ArtistIdentityPluginRoot extends AbstractPlugin implements
     }
 
     @Override
-    public HashMap<ExternalPlatform, HashMap<UUID, String>> listExternalIdentitiesFromCurrentDeviceUser() throws CantListArtistIdentitiesException {
+    public HashMap<ArtExternalPlatform, HashMap<UUID, String>> listExternalIdentitiesFromCurrentDeviceUser() throws CantListArtistIdentitiesException {
 
         /*
             We'll return a HashMap based on the external platform containing another hashmap with the user and the id to that platform
          */
-        HashMap<ExternalPlatform, HashMap<UUID,String>> externalArtistIdentities = new HashMap<>();
+        HashMap<ArtExternalPlatform, HashMap<UUID,String>> externalArtistIdentities = new HashMap<>();
         HashMap<UUID,String> externalArtist = new HashMap<>();
-        for (ExternalPlatform externalPlatform:
-             ExternalPlatform.values()) {
+        for (ArtExternalPlatform externalPlatform:
+             ArtExternalPlatform.values()) {
             //Future platform will need to be added manually to the switch
             switch (externalPlatform){
                 case TOKENLY:
@@ -226,8 +249,8 @@ public class ArtistIdentityPluginRoot extends AbstractPlugin implements
         try {
             Artist artist = identityArtistManager.getIdentitArtist(publicKey);
             if(artist != null){
-                for (ExternalPlatform externalPlatform:
-                        ExternalPlatform.values()) {
+                for (ArtExternalPlatform externalPlatform:
+                        ArtExternalPlatform.values()) {
                     //Future platform will need to be added manually to the switch
                     switch (externalPlatform){
                         case TOKENLY:

@@ -20,7 +20,6 @@ import com.bitdubai.fermat_art_api.layer.identity.fan.exceptions.CantListFanIden
 import com.bitdubai.fermat_art_api.layer.identity.fan.interfaces.Fanatic;
 import com.bitdubai.fermat_art_api.layer.identity.fan.interfaces.FanaticIdentityManager;
 import com.bitdubai.fermat_art_plugin.layer.identity.fan.developer.bitdubai.version_1.exceptions.CantAddNewArtistConnectedException;
-import com.bitdubai.fermat_tky_api.all_definitions.enums.ExternalPlatform;
 import com.bitdubai.fermat_tky_api.all_definitions.exceptions.IdentityNotFoundException;
 import com.bitdubai.fermat_tky_api.all_definitions.exceptions.ObjectNotSetException;
 import com.bitdubai.fermat_tky_api.layer.identity.fan.exceptions.CantGetFanIdentityException;
@@ -121,7 +120,7 @@ public class FanIdentityEventActions {
             CantAddNewArtistConnectedException {
         //First, we get the Identities from this device
         List<Fanatic> fanaticList = fanaticIdentityManager.listIdentitiesFromCurrentDeviceUser();
-        ExternalPlatform externalPlatform;
+        ArtExternalPlatform externalPlatform;
         ActorSearch<ArtistExposingData> actorSearch;
         List<ArtistExposingData> artistExposingDataList;
         for(Fanatic fanatic : fanaticList){

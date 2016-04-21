@@ -24,12 +24,15 @@ import com.bitdubai.fermat_api.layer.osa_android.database_system.PluginDatabaseS
 import com.bitdubai.fermat_api.layer.osa_android.file_system.PluginFileSystem;
 import com.bitdubai.fermat_api.layer.osa_android.logger_system.LogLevel;
 import com.bitdubai.fermat_api.layer.osa_android.logger_system.LogManager;
+import com.bitdubai.fermat_art_api.all_definition.enums.ArtExternalPlatform;
 import com.bitdubai.fermat_art_api.all_definition.events.enums.EventType;
 import com.bitdubai.fermat_art_api.all_definition.exceptions.CantPublishIdentityException;
 import com.bitdubai.fermat_art_api.all_definition.exceptions.IdentityNotFoundException;
 import com.bitdubai.fermat_art_api.all_definition.interfaces.ArtIdentity;
+import com.bitdubai.fermat_art_api.layer.actor_network_service.exceptions.CantExposeIdentitiesException;
 import com.bitdubai.fermat_art_api.layer.actor_network_service.exceptions.CantExposeIdentityException;
 import com.bitdubai.fermat_art_api.layer.actor_network_service.interfaces.artist.ArtistManager;
+import com.bitdubai.fermat_art_api.layer.actor_network_service.interfaces.artist.util.ArtistExposingData;
 import com.bitdubai.fermat_art_api.layer.actor_network_service.interfaces.fan.FanManager;
 import com.bitdubai.fermat_art_api.layer.actor_network_service.interfaces.fan.util.FanExposingData;
 import com.bitdubai.fermat_art_api.layer.identity.fan.exceptions.CantCreateFanIdentityException;
@@ -146,8 +149,9 @@ public class FanaticPluginRoot extends AbstractPlugin implements
             eventManager.addListener(updatesListener);
             listenersAdded.add(updatesListener);
 
+            exposeIdentities();
             System.out.println("############\n ART IDENTITY Fanatic STARTED\n");
-            testCreateArtist();
+            //testCreateArtist();
             //testAskForConnection();
         } catch (Exception e) {
             errorManager.reportUnexpectedPluginException(Plugins.FANATIC_IDENTITY, UnexpectedPluginExceptionSeverity.DISABLES_THIS_PLUGIN, e);
@@ -165,6 +169,25 @@ public class FanaticPluginRoot extends AbstractPlugin implements
                 tokenlyFanIdentityManager);
     }
 
+    private void exposeIdentities(){
+        ArrayList<FanExposingData> artistExposingDatas = new ArrayList<>();
+        try {
+            for (Fanatic fan :
+                    identityFanaticManager.listIdentitiesFromCurrentDeviceUser()) {
+                artistExposingDatas.add(new FanExposingData(
+                        fan.getPublicKey(),
+                        fan.getAlias(),
+                        fan.getProfileImage()
+                ));
+            }
+            fanManager.exposeIdentities(artistExposingDatas);
+        } catch (CantListFanIdentitiesException e) {
+            e.printStackTrace();
+        } catch (CantExposeIdentitiesException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void testCreateArtist(){
         String alias = "perezilla";
         byte[] image = new byte[0];
@@ -176,14 +199,14 @@ public class FanaticPluginRoot extends AbstractPlugin implements
         try {
             tokenlyFanIdentityManager.createFanIdentity(alias, image, password, externalPlatformTokenly);
 
-        HashMap<ExternalPlatform, HashMap<UUID,String>> externalIdentites = null;
+        HashMap<ArtExternalPlatform, HashMap<UUID,String>> externalIdentites = null;
 
             externalIdentites = identityFanaticManager.listExternalIdentitiesFromCurrentDeviceUser();
 
-        Iterator<Map.Entry<ExternalPlatform, HashMap<UUID, String>>> entries = externalIdentites.entrySet().iterator();
+        Iterator<Map.Entry<ArtExternalPlatform, HashMap<UUID, String>>> entries = externalIdentites.entrySet().iterator();
             UUID externalIdentityID = null;
             while (entries.hasNext()) {
-                Map.Entry<ExternalPlatform, HashMap<UUID, String>> entry = entries.next();
+                Map.Entry<ArtExternalPlatform, HashMap<UUID, String>> entry = entries.next();
                 HashMap<UUID, String> artists = entry.getValue();
                 Iterator<Map.Entry<UUID, String>> entiesSet = artists.entrySet().iterator();
                 while(entiesSet.hasNext()){

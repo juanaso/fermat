@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,9 +51,9 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
     private ErrorManager errorManager;
 
 
-    Button bplay;
-    Button bbb;
-    Button bff;
+    ImageButton bplay;
+    ImageButton bbb;
+    ImageButton bff;
     SeekBar pb;
     TextView tiempo;
     TextView song;
@@ -122,9 +122,9 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         view=inflater.inflate(R.layout.art_music_player_activity,container,false);
         getActivity().getWindow().setBackgroundDrawableResource(R.drawable.musicplayer_background_viewpager);
-        bplay = (Button) view.findViewById(R.id.play);
-        bbb = (Button) view.findViewById(R.id.back);
-        bff = (Button) view.findViewById(R.id.forward);
+        bplay = (ImageButton) view.findViewById(R.id.play);
+        bbb = (ImageButton) view.findViewById(R.id.back);
+        bff = (ImageButton) view.findViewById(R.id.forward);
         pb=(SeekBar) view.findViewById(R.id.progressBar);
         tiempo=(TextView) view.findViewById((R.id.tiempo));
         recyclerView = (RecyclerView) view.findViewById(R.id.rv);
@@ -176,8 +176,6 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
             @Override
             public void onClick(View v) {
                 play();
-                songPlayerThread = new ThreadSong(false);
-                songPlayerThread.execute();
 
             }
         });
@@ -203,6 +201,7 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
 
         return view;
     }
+
 
 
     void loadmysong(){
@@ -231,65 +230,43 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
     private void clickplay(int position) {
 
 
-   /*     try {
-            AssetFileDescriptor afd = getResources().openRawResourceFd(items.get(position).getSong());
-
-            Toast.makeText(view.getContext(), items.get(position).getTitle(), Toast.LENGTH_SHORT).show();
-            songposition=position;
-            song.setText(items.get(position).getTitle());
-            miTareaAsincrona = new ThreadSong(false);
-            miTareaAsincrona.execute();
-            stop();
-            mp.reset();
-            mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getDeclaredLength());
-            mp.prepare();
-            mp.start();
-            pb.setMax( (int)(mp.getDuration()/1000));
-
-            afd.close();
-        } catch (IllegalArgumentException e) {
-            Log.e(TAG, "Unable to play audio queue do to exception: " + e.getMessage(), e);
-        } catch (IllegalStateException e) {
-            Log.e(TAG, "Unable to play audio queue do to exception: " + e.getMessage(), e);
-        } catch (IOException e) {
-            Log.e(TAG, "Unable to play audio queue do to exception: " + e.getMessage(), e);
-        }*/
-
         try {
 
 
-            // create temp file that will hold byte array
-            File tempMp3 = File.createTempFile("i_know_now", "mp3", view.getContext().getCacheDir());
-            tempMp3.deleteOnExit();
-            FileOutputStream fos = new FileOutputStream(tempMp3);
-            fos.write(musicPlayermoduleManager.getSongWithBytes(items.get(position).getSong_id()).getSongBytes());
-            fos.close();
-
-            // Tried reusing instance of media player
-            // but that resulted in system crashes...
-          //  MediaPlayer mediaPlayer = new MediaPlayer();
-
-            // Tried passing path directly, but kept getting
-
-            FileInputStream fis = new FileInputStream(tempMp3);
-            mp.setDataSource(fis.getFD());
+            if(items.size()>0) {
+                File tempMp3 = File.createTempFile("tempfermatmusic", "mp3", view.getContext().getCacheDir());
+                tempMp3.deleteOnExit();
+                FileOutputStream fos = new FileOutputStream(tempMp3);
+                fos.write(musicPlayermoduleManager.getSongWithBytes(items.get(position).getSong_id()).getSongBytes());
+                fos.close();
 
 
-            Toast.makeText(view.getContext(), items.get(position).getSong_name(), Toast.LENGTH_SHORT).show();
-            songposition=position;
-            song.setText(items.get(position).getSong_name());
-            songPlayerThread = new ThreadSong(false);
-            songPlayerThread.execute();
- //           stop();
- //           mp.reset();
-
-            mp.prepare();
-            mp.start();
+                if (mp.isPlaying() || pause) {
+                    stop();
+                    mp.reset();
+                }
 
 
-            pb.setMax( (int)(mp.getDuration()/1000));
+                FileInputStream fis = new FileInputStream(tempMp3);
+                mp.setDataSource(fis.getFD());
+                tempMp3.delete();
+
+                //  Toast.makeText(view.getContext(), items.get(position).getSong_name(), Toast.LENGTH_SHORT).show();
+                songposition = position;
+                song.setText(items.get(position).getSong_name());
 
 
+                mp.prepare();
+
+                System.out.println("ART_MP_duration:" + mp.getDuration() / 1000);
+
+                pb.setMax((int) (mp.getDuration() / 1000));
+
+                songPlayerThread = new ThreadSong(false);
+                songPlayerThread.execute();
+
+
+            }
 
 
         }  catch (IOException e) {
@@ -327,6 +304,7 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
             mp.stop();
             pb.setProgress(0);
             tiempo.setText("0:00");
+     //       songPlayerThread.cancelmusicplayer=true;
         } catch (IllegalStateException e) {
             Log.e(TAG, "Unable to play audio queue do to exception: " + e.getMessage(), e);
         }
@@ -334,9 +312,11 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
 
 
     void init(){
-        pb.setProgress(0);
-        tiempo.setText("");
-        song.setText("");
+        if(!mp.isPlaying() || pause) {
+            pb.setProgress(0);
+            tiempo.setText("");
+            song.setText("");
+        }
         loadmysong();
     }
 
@@ -355,7 +335,7 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
         if((int)(mp.getCurrentPosition()/1000)<3) {
             songposition = songposition - 1;
             if (songposition < 0) {
-                songposition = items.size();
+                songposition = items.size()-1;
                 clickplay(songposition);
             } else {
                 clickplay(songposition);
@@ -366,17 +346,18 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
     }
 
 
-    public class ThreadSong extends AsyncTask<Void, Float, Void> {
+    public class ThreadSong extends AsyncTask<Void, Float, Boolean> {
         private boolean cancelmusicplayer;
-
         public ThreadSong(boolean cancelmusicplayer) {this.cancelmusicplayer = cancelmusicplayer;}
 
 
         @Override
-        protected void onPreExecute() {}
+        protected void onPreExecute() {
+            mp.start();
+        }
 
         @Override
-        protected Void doInBackground(Void... withNotUse) {
+        protected Boolean doInBackground(Void... withNotUse) {
 
             float progreso = 0.0f;
             while (true) {
@@ -393,12 +374,15 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
 
                     publishProgress(progreso);
 
+
                     if (cancelmusicplayer) {
                         cancel(true);
                     }
                 }
 
+
             }
+
 
         }
 
@@ -408,38 +392,41 @@ public class MusicPlayerMainActivity extends AbstractFermatFragment {
             Log.v(TAG, "songtime:"+porcentajeProgreso[0]+"");
 
             pb.setProgress( Math.round(porcentajeProgreso[0]) );
+
+            if((mp.getCurrentPosition()/1000)>=(mp.getDuration()/1000)-1){
+                System.out.println("ART_THIS IS THE END");
+                nextsong();
+            }
+
         }
 
-        String crono(float tiempo){
-            float horas,minutos;
-            int segundos;
-            String conteo;
-            minutos=tiempo/60;
-            if(minutos>0){
-                segundos=(int)tiempo-(int)(tiempo/60)*60;
-                if(segundos<10){
-                    conteo=String.valueOf((int)(minutos))+":0"+segundos;
+        String crono(float time){
+            float hour,min;
+            int seg;
+            String count;
+            min=time/60;
+            if(min>0){
+                seg=(int)time-(int)(time/60)*60;
+                if(seg<10){
+                    count=String.valueOf((int)(min))+":0"+seg;
                 }else{
-                    conteo=String.valueOf((int)(minutos))+":"+segundos;
+                    count=String.valueOf((int)(min))+":"+seg;
                 }
             }else{
-                if(tiempo<10){
-                    conteo="0:0"+(int)tiempo;
+                if(time<10){
+                    count="0:0"+(int)time;
                 }else{
-                    conteo="0:"+(int)tiempo;
+                    count="0:"+(int)time;
                 }
 
             }
-            return conteo;
+            return count;
         }
 
 
-     /*   @Override
-        protected void onPostExecute(Integer cantidadProcesados) {
-            //TV_mensaje.setText("DESPUÉS de TERMINAR la descarga. Se han descarcado "+cantidadProcesados+" imágenes. Hilo PRINCIPAL");
-            Log.v(TAG, "DESPUÉS de TERMINAR la descarga. Se han descarcado "+cantidadProcesados+" imágenes. Hilo PRINCIPAL");
+/*
+        protected void onPostExecute(Boolean cantidadProcesados) {
 
-            tiempo.setTextColor(Color.GREEN);
         }*/
 
 
