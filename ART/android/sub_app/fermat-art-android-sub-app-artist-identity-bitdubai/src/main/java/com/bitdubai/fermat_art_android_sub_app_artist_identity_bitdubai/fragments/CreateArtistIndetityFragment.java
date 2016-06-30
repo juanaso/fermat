@@ -20,6 +20,8 @@ import android.os.Bundle;
 
 import android.provider.MediaStore;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -95,6 +97,7 @@ public class CreateArtistIndetityFragment extends AbstractFermatFragment<ArtistI
     private static final int CONTEXT_MENU_CAMERA = 1;
     private static final int CONTEXT_MENU_GALLERY = 2;
     private static final int CONTEXT_MENU_DELETE = 3;
+    private static final int MAX_ALIAS_CHARACTER=40;
     private static final int CONTEXT_MENU_TURN_RIGHT = 4;
     private static final int CONTEXT_MENU_TURN_LEFT = 5;
 
@@ -407,6 +410,48 @@ public class CreateArtistIndetityFragment extends AbstractFermatFragment<ArtistI
 
 
             }
+        });
+
+        mArtistUserName.addTextChangedListener(new TextWatcher() {
+            /** flag to prevent loop call of onTextChanged() */
+            private boolean setTextFlag = true;
+            private Toast toastChar = null;
+
+
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                 if (mArtistUserName.getText().length() >= MAX_ALIAS_CHARACTER) {
+                     //this to avoid toast accumulation
+                     if (toastChar != null) toastChar.cancel();
+                     toastChar = Toast.makeText(getActivity(), "Only "+MAX_ALIAS_CHARACTER+" chars allowed", Toast.LENGTH_SHORT);
+                     toastChar.show();
+
+
+                    // set the text to a string max length MAX_ALIAS_CHARACTER:
+                    if (setTextFlag) {
+                        setTextFlag = false;
+                        mArtistUserName.setText(s.subSequence(0, MAX_ALIAS_CHARACTER));
+                        mArtistUserName.setSelection(mArtistUserName.getText().length());
+                    } else {
+                        setTextFlag = true;
+                    }
+                }
+            }
+
         });
 
         mArtistExternalName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -832,7 +877,7 @@ public class CreateArtistIndetityFragment extends AbstractFermatFragment<ArtistI
                     artistImageByteArray = toByteArray(imageBitmap);
                     updateProfileImage = true;
                     //Picasso.with(getActivity()).load(selectedImage2).transform(new CircleTransform()).into(artistImage);
-                    updateProfileImage = true;
+                    //updateProfileImage = true;
                     break;
                 case REQUEST_LOAD_IMAGE:
                     Uri selectedImage = data.getData();
@@ -918,8 +963,8 @@ public class CreateArtistIndetityFragment extends AbstractFermatFragment<ArtistI
         menu.add(Menu.NONE, CONTEXT_MENU_CAMERA, Menu.NONE, "Camera");
         menu.add(Menu.NONE, CONTEXT_MENU_GALLERY, Menu.NONE, "Gallery");
         if (updateProfileImage) {
-            menu.add(Menu.NONE, CONTEXT_MENU_TURN_RIGHT, Menu.NONE, "turn pic right");
-            menu.add(Menu.NONE, CONTEXT_MENU_TURN_LEFT, Menu.NONE, "turn pic left");
+            menu.add(Menu.NONE, CONTEXT_MENU_TURN_RIGHT, Menu.NONE, "Turn pic right");
+            menu.add(Menu.NONE, CONTEXT_MENU_TURN_LEFT, Menu.NONE, "Turn pic left");
             menu.add(Menu.NONE, CONTEXT_MENU_DELETE, Menu.NONE, "Delete Picture");
         }
 
