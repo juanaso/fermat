@@ -95,6 +95,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
              * functionality based on wallets downloaded by users this wont be an option.
              * * *
              */
+
             factoryReset();
 
             this.serviceStatus = ServiceStatus.STARTED;
@@ -4018,7 +4019,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         StatusBar statusBar;
         Activity runtimeActivity;
         Fragment runtimeFragment;
-        String tabTitleColor = "#555759";
+        String tabTitleColor = "#939598";
         String tabBarColor="#E6E7E8";
 
         RuntimeSubApp subAppFanCommunity = new RuntimeSubApp();

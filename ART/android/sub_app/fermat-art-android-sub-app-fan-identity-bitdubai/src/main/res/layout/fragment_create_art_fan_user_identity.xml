@@ -71,9 +71,10 @@
         android:hint="Your Name"
         android:paddingTop="23dp"
         android:lines="1"
+        android:singleLine="true"
         android:textColorHint="@color/cardview_dark_background"
         android:textColor="@color/cardview_dark_background"
-        android:textSize="25dp"></EditText>
+        android:textSize="25dp"/>
 
     <View
         android:id="@+id/edit_buttom"
