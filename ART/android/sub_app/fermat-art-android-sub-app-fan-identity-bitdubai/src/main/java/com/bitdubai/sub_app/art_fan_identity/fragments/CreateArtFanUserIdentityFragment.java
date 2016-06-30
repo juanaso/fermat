@@ -697,7 +697,7 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
                     imageBitmap = Bitmap.createScaledBitmap(imageBitmap, pictureView.getWidth(), pictureView.getHeight(), true);
                     fanImageByteArray = toByteArray(imageBitmap);
                     updateProfileImage = true;
-                    Picasso.with(getActivity()).load(selectedImage2).transform(new CircleTransform()).into(fanImage);
+                   // Picasso.with(getActivity()).load(selectedImage2).transform(new CircleTransform()).into(fanImage);
                     updateProfileImage = true;
                     break;
                 case REQUEST_LOAD_IMAGE:
@@ -712,7 +712,7 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
                             imageBitmap = Bitmap.createScaledBitmap(imageBitmap, pictureView.getWidth(), pictureView.getHeight(), true);
                             fanImageByteArray = toByteArray(imageBitmap);
                             updateProfileImage = true;
-                            Picasso.with(getActivity()).load(selectedImage).transform(new CircleTransform()).into(fanImage);
+                           // Picasso.with(getActivity()).load(selectedImage).transform(new CircleTransform()).into(fanImage);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

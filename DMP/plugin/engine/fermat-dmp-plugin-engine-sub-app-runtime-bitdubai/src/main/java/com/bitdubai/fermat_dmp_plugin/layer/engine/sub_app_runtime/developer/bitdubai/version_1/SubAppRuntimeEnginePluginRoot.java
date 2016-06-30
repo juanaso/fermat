@@ -4019,8 +4019,9 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         StatusBar statusBar;
         Activity runtimeActivity;
         Fragment runtimeFragment;
-        String tabTitleColor = "#939598";
-        String tabBarColor="#E6E7E8";
+        String StatusBarColor = "#939598";
+        String tabTitleColor = "#323232";
+        String tabBarColor="#D1D3D4";
 
         RuntimeSubApp subAppFanCommunity = new RuntimeSubApp();
         subAppFanCommunity.setType(SubApps.ART_FAN_COMMUNITY);
@@ -4064,7 +4065,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setColor("#FF0B46F0");
 
         statusBar = new StatusBar();
-        statusBar.setColor("#000000");
+        statusBar.setColor(StatusBarColor);
         runtimeActivity.setStatusBar(statusBar);
 
         runtimeTitleBar = new TitleBar();
@@ -4093,7 +4094,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setColor("#FF0B46F0");
 
         statusBar = new StatusBar();
-        statusBar.setColor("#0072bb");
+        statusBar.setColor(StatusBarColor);
         runtimeActivity.setStatusBar(statusBar);
 
         runtimeTitleBar = new TitleBar();
@@ -4105,7 +4106,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setTitleBar(runtimeTitleBar);
 
         statusBar = new StatusBar();
-        statusBar.setColor("#E6E7E8");
+        statusBar.setColor(StatusBarColor);
         runtimeActivity.setStatusBar(statusBar);
 
         runtimeFragment = new Fragment();
@@ -4125,7 +4126,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setColor("#FF0B46F0");
 
         statusBar = new StatusBar();
-        statusBar.setColor("#E6E7E8");
+        statusBar.setColor(StatusBarColor);
         runtimeActivity.setStatusBar(statusBar);
 
         runtimeTitleBar = new TitleBar();
@@ -4137,7 +4138,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setTitleBar(runtimeTitleBar);
 
         statusBar = new StatusBar();
-        statusBar.setColor("#E6E7E8");
+        statusBar.setColor(StatusBarColor);
         runtimeActivity.setStatusBar(statusBar);
 
         runtimeFragment = new Fragment();
@@ -4158,7 +4159,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setColor("#FF0B46F0");
 
         statusBar = new StatusBar();
-        statusBar.setColor("#0072bb");
+        statusBar.setColor(StatusBarColor);
         runtimeActivity.setStatusBar(statusBar);
 
         runtimeTitleBar = new TitleBar();
@@ -4170,7 +4171,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setTitleBar(runtimeTitleBar);
 
         statusBar = new StatusBar();
-        statusBar.setColor("#6D6F71");
+        statusBar.setColor(StatusBarColor);
         runtimeActivity.setStatusBar(statusBar);
 
         runtimeFragment = new Fragment();
@@ -4191,7 +4192,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setColor("#FF0B46F0");
 
         statusBar = new StatusBar();
-        statusBar.setColor("#0072bb");
+        statusBar.setColor(StatusBarColor);
         runtimeActivity.setStatusBar(statusBar);
 
         runtimeTitleBar = new TitleBar();
@@ -4204,7 +4205,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setTitleBar(runtimeTitleBar);
 
         statusBar = new StatusBar();
-        statusBar.setColor("#E6E7E8");
+        statusBar.setColor(StatusBarColor);
         runtimeActivity.setStatusBar(statusBar);
 
         runtimeFragment = new Fragment();

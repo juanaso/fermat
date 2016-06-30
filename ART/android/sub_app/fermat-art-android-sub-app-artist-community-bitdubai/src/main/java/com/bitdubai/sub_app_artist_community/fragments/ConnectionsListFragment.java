@@ -132,7 +132,7 @@ public class ConnectionsListFragment extends AbstractFermatFragment<ArtistSubApp
                                 emptyView.setVisibility(View.VISIBLE);
                             } else {
                                 //showEmpty(false, emptyView);
-                                emptyView.setVisibility(View.VISIBLE);
+                                emptyView.setVisibility(View.GONE);
                             }
                         }
                     } else

@@ -110,13 +110,16 @@
                 android:lines="1"
                 android:padding="6dp"
                 android:singleLine="true"
+                android:digits="abcdefghijklmnñopqrstuvwxyz.
+                0123456789.
+                ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
                 android:textColor="@android:color/white"
                 android:textColorHint="#999999"
                 android:textSize="16sp"
                 tools:ignore="HardcodedText"
                 android:layout_below="@+id/aai_username_label"
                 android:layout_alignParentStart="true"
-                 />
+                />
 
         </RelativeLayout>
 
