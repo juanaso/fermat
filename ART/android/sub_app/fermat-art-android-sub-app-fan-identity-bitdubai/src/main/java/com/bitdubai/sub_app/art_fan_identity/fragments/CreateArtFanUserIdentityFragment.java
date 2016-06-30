@@ -671,7 +671,7 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
                     imageBitmap = Bitmap.createScaledBitmap(imageBitmap, pictureView.getWidth(), pictureView.getHeight(), true);
                     fanImageByteArray = toByteArray(imageBitmap);
                     updateProfileImage = true;
-                    Picasso.with(getActivity()).load(selectedImage2).transform(new CircleTransform()).into(fanImage);
+                   // Picasso.with(getActivity()).load(selectedImage2).transform(new CircleTransform()).into(fanImage);
                     updateProfileImage = true;
                     break;
                 case REQUEST_LOAD_IMAGE:
@@ -686,7 +686,7 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
                             imageBitmap = Bitmap.createScaledBitmap(imageBitmap, pictureView.getWidth(), pictureView.getHeight(), true);
                             fanImageByteArray = toByteArray(imageBitmap);
                             updateProfileImage = true;
-                            Picasso.with(getActivity()).load(selectedImage).transform(new CircleTransform()).into(fanImage);
+                          //  Picasso.with(getActivity()).load(selectedImage).transform(new CircleTransform()).into(fanImage);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -711,9 +711,9 @@ public class CreateArtFanUserIdentityFragment extends AbstractFermatFragment {
             int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
             int rotationInDegrees = exifToDegrees(rotation);
             Matrix matrix = new Matrix();
-            if (rotation != 0f) {
+
                 matrix.preRotate(rotationInDegrees);
-            }
+
             rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
 
