@@ -342,7 +342,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
             runtimeSubApp.addActivity(runtimeActivity);
 
             runtimeWizard = new Wizard();
-            runtimeWizardPage = new WizardPage();
+                        runtimeWizardPage = new WizardPage();
             runtimeWizardPage.setType(WizardPageTypes.CWP_WALLET_PUBLISHER_PUBLISH_STEP_1);
             runtimeWizard.addPage(runtimeWizardPage);
 
@@ -4065,7 +4065,7 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setColor("#FF0B46F0");
 
         statusBar = new StatusBar();
-        statusBar.setColor(StatusBarColor);
+        statusBar.setColor("#000000");
         runtimeActivity.setStatusBar(statusBar);
 
         runtimeTitleBar = new TitleBar();
