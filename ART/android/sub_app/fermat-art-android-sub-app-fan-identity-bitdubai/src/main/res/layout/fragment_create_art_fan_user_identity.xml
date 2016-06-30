@@ -69,15 +69,23 @@
         android:layout_centerHorizontal="true"
         android:background="@android:color/transparent"
         android:hint="Your Name"
+<<<<<<< HEAD
         android:paddingTop="23dp"
         android:digits="abcdefghijklmnñopqrstuvwxyz.
                 0123456789.
                 ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
+=======
+>>>>>>> 32f43e2da7033590ceddecf741589ef405378f6c
         android:lines="1"
         android:singleLine="true"
         android:textColorHint="@color/cardview_dark_background"
         android:textColor="@color/cardview_dark_background"
+<<<<<<< HEAD
         android:textSize="25dp"/>
+=======
+        android:textSize="25dp"
+        android:layout_marginTop="22dp"></EditText>
+>>>>>>> 32f43e2da7033590ceddecf741589ef405378f6c
 
     <View
         android:id="@+id/edit_buttom"

@@ -4065,7 +4065,11 @@ public class SubAppRuntimeEnginePluginRoot extends AbstractPlugin implements Sub
         runtimeActivity.setColor("#FF0B46F0");
 
         statusBar = new StatusBar();
+<<<<<<< HEAD
         statusBar.setColor(StatusBarColor);
+=======
+        statusBar.setColor("#000000");
+>>>>>>> 32f43e2da7033590ceddecf741589ef405378f6c
         runtimeActivity.setStatusBar(statusBar);
 
         runtimeTitleBar = new TitleBar();
